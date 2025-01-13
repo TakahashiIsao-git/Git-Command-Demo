@@ -36,8 +36,5 @@ public class StudentManagementApplicationTests {
     return "Student added successfully";
 
   }
-
-
 }
 
-}
