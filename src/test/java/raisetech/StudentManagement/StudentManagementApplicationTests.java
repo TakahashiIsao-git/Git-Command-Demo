@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootTest
@@ -28,6 +29,11 @@ public class StudentManagementApplicationTests {
 		return students;
 	}
 	
+	@PostMapping("/students")
+	public String addStudents(String name, String age) {
+		students.put(name, age);
+		return "student added successfully";
+	}
 	
 	}
 	
