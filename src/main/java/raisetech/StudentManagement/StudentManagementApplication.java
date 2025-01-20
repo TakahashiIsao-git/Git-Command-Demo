@@ -23,7 +23,7 @@ public class StudentManagementApplication {
   }
 
   @GetMapping("/student")
-  public String getStudent(@RequestParam String name) {
+  public String getStudent(@RequestParam("name") String name) {
     Student student = repository.searchByName(name);
     return student.getName() + " " + student.getAge() + "歳";
   }
