@@ -1,6 +1,5 @@
 package raisetech.StudentManagement;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
