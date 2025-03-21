@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
+import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.repositry.StudentRepository;
 import raisetech.StudentManagement.repository.StudentRepository;
 
 @Service
@@ -33,5 +35,10 @@ public class StudentService {
         .filter(studentsCourses -> "Javaコース".equals(studentsCourses.getCourseName()))
         .collect(Collectors.toList());
     return repository.searchStudentsCourses();
+    return repository.searchStudentsCourses();
+  }
+
+  public void registerStudent(StudentDetail studentDetail) {
+    repository.registerStudent(studentDetail.getStudent());
   }
 }
