@@ -5,20 +5,47 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
 
 @Mapper
 public interface StudentRepository {
 
-  // 全件検索用
-  @Select("SELECT * FROM students")
+  //WHERE文でisDeleted=trueの項目を除外する➡isDeleted=falseにして一覧画面に出ないようにする
+  @Select("SELECT * FROM students WHERE isDeleted = false")
   List<Student> search();
 
-  // 年齢を30代に限定して絞り込み検索する用
-  @Select("SELECT * FROM students WHERE age >= 30 && age <= 39")
-  List<Student> searchStudentInThirties();
+  // 単一の受講生情報を検索する
+  @Select("SELECT * FROM students WHERE id = #{id}")
+  Student searchStudent(String id);
 
   @Select("SELECT * FROM students_courses")
-  List<StudentsCourses> searchStudentsCourses();
+  List<StudentsCourses> searchStudentsCoursesList();
+
+  //　単一の受講生コース情報を検索する
+  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
+  List<StudentsCourses> searchStudentsCourses(Long studentId);
+
+  //　受講生情報の登録処理
+  @Insert("INSERT INTO students (name, kana_name, nickName, email, area, age, sex, remark, isDeleted) " +
+      "VALUES (#{name}, #{kanaName}, #{nickName}, #{email}, #{area}, #{age}, #{sex}, #{remark}, false)")
+  @Options(useGeneratedKeys = true, keyProperty = "id") // DBがidを取得できるようにする
+  void registerStudent(Student student);
+
+  // 受講生コース情報の登録処理
+  @Insert("INSERT INTO students_courses (student_id, course_name, course_start_at, course_end_at) " +
+      "VALUES (#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt})")
+  @Options(useGeneratedKeys = true, keyProperty = "id") // DBがidを取得できるようにする
+  void registerStudentsCourses(StudentsCourses studentsCourses);
+
+  // 受講生情報の更新処理
+  @Update("UPDATE students SET name = #{name}, kana_name = #{kanaName}, nickName = #{nickName}, "
+      + "email = #{email}, area = #{area}, age = #{age}, sex = #{sex}, remark = #{remark}, isDeleted = #{isDeleted} "
+      + "WHERE id = #{id}")
+  void updateStudent(Student student);
+
+  // 受講生コース情報の更新処理
+  @Update("UPDATE students_courses SET course_name = #{courseName} WHERE id = #{id}")
+  void updateStudentsCourses(StudentsCourses studentsCourses);
 }

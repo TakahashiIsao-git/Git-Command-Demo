@@ -1,8 +1,10 @@
 package raisetech.StudentManagement.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -22,14 +24,13 @@ public class StudentService {
     return repository.search();
   }
 
-  // 年齢を30代に限定して絞り込み検索するためのメソッド
-  public List<Student> searchStudentInThirties() {
-    return repository.searchStudentInThirties();
-
-  // 絞り込みをして、年齢が30代の人のみ抽出する。抽出したリストをControllerに返す。
-  public List<Student> search30yearsOldStudentList() {
-    return repository.search().stream()
-        .filter(student -> student.getAge() >= 30 && student.getAge() <= 39).toList();
+  public StudentDetail searchStudent(String id) {
+    Student student = repository.searchStudent(id);
+    List<StudentsCourses> studentsCourses = repository.searchStudentsCourses(student.getId());
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(student);
+    studentDetail.setStudentsCourses(studentsCourses);
+    return studentDetail;
   }
 
   public List<StudentsCourses> searchStudentsCoursesList() {
@@ -38,10 +39,27 @@ public class StudentService {
         .filter(studentsCourses -> "Javaコース".equals(studentsCourses.getCourseName()))
         .collect(Collectors.toList());
     return repository.searchStudentsCourses();
-    return repository.searchStudentsCourses();
+    return repository.searchStudentsCoursesList();
   }
 
+  @Transactional // 更新や削除などトランザクション管理のアノテーション（トランザクション範囲は任意）
   public void registerStudent(StudentDetail studentDetail) {
+    // 受講生登録
     repository.registerStudent(studentDetail.getStudent());
+    // TODO:コース情報登録
+    for (StudentsCourses studentsCourse : studentDetail.getStudentsCourses()) {
+      studentsCourse.setStudentId(Long.valueOf(String.valueOf(studentDetail.getStudent().getId())));
+      studentsCourse.setCourseStartAt(LocalDateTime.now());
+      studentsCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
+      repository.registerStudentsCourses(studentsCourse);
+    }
   }
-}
+  // 受講生更新：repositoryから情報を受け取る
+  @Transactional
+  public void updateStudent(StudentDetail studentDetail) {
+    repository.updateStudent(studentDetail.getStudent());
+    for (StudentsCourses studentsCourse : studentDetail.getStudentsCourses()) {
+      repository.updateStudentsCourses(studentsCourse);
+    }
+  }
+ }
