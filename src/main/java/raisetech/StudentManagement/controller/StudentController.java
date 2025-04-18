@@ -117,9 +117,6 @@ public class StudentController {
       // 入力エラーが発生すれば更新ページへ戻る
       return "updateStudent";
     }
-    // 受講生情報を更新する
-    service.updateStudent(studentDetail);
-    // 更新後に受講生一覧ページへ
-    return "redirect:/studentList";
+
   }
 }
