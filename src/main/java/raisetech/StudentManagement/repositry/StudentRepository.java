@@ -50,7 +50,5 @@ public interface StudentRepository {
   void updateStudentsCourses(StudentsCourses studentsCourses);
 }
 
-  // 第18回削除処理は@Updateを修正する
-
 
 

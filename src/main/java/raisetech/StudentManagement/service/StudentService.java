@@ -58,7 +58,4 @@ public class StudentService {
       repository.updateStudentsCourses(studentsCourse);
     }
   }
-
-  // スタンダード第18回削除処理は第17回更新処理と同じコード
-
 }
