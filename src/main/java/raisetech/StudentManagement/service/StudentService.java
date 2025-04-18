@@ -62,4 +62,17 @@ public class StudentService {
       repository.updateStudentsCourses(studentsCourse);
     }
   }
+  // 受講生更新：repositoryから情報を受け取る
+  @Transactional
+  public void updateStudent(StudentDetail studentDetail) {
+    repository.updateStudent(studentDetail.getStudent());
+    for (StudentsCourses studentsCourse : studentDetail.getStudentsCourses()) {
+      // studentsCourse.setStudentId(studentDetail.getStudent().getId()); このコード実装はバツ
+      repository.updateStudentsCourses(studentsCourse);
+    }
+  }
+
+  // スタンダード第18回削除処理は第17回更新処理と同じコード
+
+}
  }

@@ -31,7 +31,7 @@ public class StudentController {
   private final StudentService service;
   private final StudentConverter converter;
 
-  @Autowired
+  @Autowired //インジェクションする
   public StudentController(StudentService service, StudentConverter converter) {
     this.service = service;
     this.converter = converter;
@@ -60,6 +60,15 @@ public class StudentController {
     return "studentList"; //テンプレートファイルを特定するためのView名
     model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses)); */
     return service.search30yearsOldStudentList();
+  }
+
+  @GetMapping("/student/{id}")
+  public String getStudent(@PathVariable String id, Model model) {
+    // 受講生情報を検索する
+    StudentDetail studentDetail = service.searchStudent(id);
+    // HTMLにデータを渡す
+    model.addAttribute("studentDetail", studentDetail);
+    return "updateStudent";
   }
 
   @GetMapping("/student/{id}")
