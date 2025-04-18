@@ -12,10 +12,6 @@ import raisetech.StudentManagement.data.StudentsCourses;
 @Mapper
 public interface StudentRepository {
 
-  //　WHERE文でisDeleted=trueの項目を除外する➡isDeleted=falseにして一覧画面に出ないようにする
-  @Select("SELECT * FROM students WHERE isDeleted = false")
-  List<Student> search();
-
   // 単一の受講生情報を検索する
   @Select("SELECT * FROM students WHERE id = #{id}")
      Student searchStudent(String id);
