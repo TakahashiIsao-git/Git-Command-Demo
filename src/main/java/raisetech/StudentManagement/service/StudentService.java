@@ -34,11 +34,6 @@ public class StudentService {
   }
 
   public List<StudentsCourses> searchStudentsCoursesList() {
-    // 絞り込み検索で、「Java」コース情報のみを抽出する。抽出したリストをControllerに返す。
-    return repository.searchStudentsCourses().stream()
-        .filter(studentsCourses -> "Javaコース".equals(studentsCourses.getCourseName()))
-        .collect(Collectors.toList());
-    return repository.searchStudentsCourses();
     return repository.searchStudentsCoursesList();
   }
 
@@ -75,4 +70,3 @@ public class StudentService {
   // スタンダード第18回削除処理は第17回更新処理と同じコード
 
 }
- }

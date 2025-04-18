@@ -12,13 +12,13 @@ import raisetech.StudentManagement.data.StudentsCourses;
 @Mapper
 public interface StudentRepository {
 
-  //WHERE文でisDeleted=trueの項目を除外する➡isDeleted=falseにして一覧画面に出ないようにする
+  //　WHERE文でisDeleted=trueの項目を除外する➡isDeleted=falseにして一覧画面に出ないようにする
   @Select("SELECT * FROM students WHERE isDeleted = false")
   List<Student> search();
 
   // 単一の受講生情報を検索する
   @Select("SELECT * FROM students WHERE id = #{id}")
-  Student searchStudent(String id);
+     Student searchStudent(String id);
 
   @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCoursesList();
@@ -41,11 +41,16 @@ public interface StudentRepository {
 
   // 受講生情報の更新処理
   @Update("UPDATE students SET name = #{name}, kana_name = #{kanaName}, nickName = #{nickName}, "
-      + "email = #{email}, area = #{area}, age = #{age}, sex = #{sex}, remark = #{remark}, isDeleted = #{isDeleted} "
-      + "WHERE id = #{id}")
+    + "email = #{email}, area = #{area}, age = #{age}, sex = #{sex}, remark = #{remark}, isDeleted = #{isDeleted} "
+    + "WHERE id = #{id}")
   void updateStudent(Student student);
 
-  // 受講生コース情報の更新処理
+  // 受講生コース情報の更新処理　WHERE後のidをstudentIdに変更してはダメ（idの検索を繰り返したい）➡Repositoryを変えずに別の方法を考える！
   @Update("UPDATE students_courses SET course_name = #{courseName} WHERE id = #{id}")
   void updateStudentsCourses(StudentsCourses studentsCourses);
 }
+
+  // 第18回削除処理は@Updateを修正する
+
+
+
