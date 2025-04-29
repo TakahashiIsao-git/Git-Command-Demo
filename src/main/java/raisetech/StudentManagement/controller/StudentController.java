@@ -37,10 +37,6 @@ public class StudentController {
   // 年代を30代に限定して絞り込み検索
   @GetMapping("/30yearsOldStudentList")
   public List<Student> get30yearsOldStudentList() {
-    /* Model model
-    List<Student> students = service.searchStudentList();
-    List<StudentsCourses> studentsCourses = service.searchStudentsCoursesList();
-    model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses)); */
     return service.search30yearsOldStudentList();
   }
 
