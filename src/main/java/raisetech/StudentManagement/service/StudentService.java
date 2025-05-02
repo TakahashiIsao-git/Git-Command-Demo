@@ -7,7 +7,6 @@ import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repositry.StudentRepository;
-import raisetech.StudentManagement.repository.StudentRepository;
 
 @Service
 public class StudentService {

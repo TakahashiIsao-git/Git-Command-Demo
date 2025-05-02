@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,7 @@ public class StudentController {
   private final StudentService service;
   private final StudentConverter converter;
 
-  @Autowired //インジェクションする
+  @Autowired
   public StudentController(StudentService service, StudentConverter converter) {
     this.service = service;
     this.converter = converter;
@@ -44,6 +46,9 @@ public class StudentController {
   }
 
   // 年代を30代に限定して絞り込み検索
+  @GetMapping("/over30")
+  public List<Student> getStudentOverThirty() {
+    return service.searchStudentOverThirty();
   @GetMapping("/30yearsOldStudentList")
   public List<Student> get30yearsOldStudentList() {
     /* Model model
