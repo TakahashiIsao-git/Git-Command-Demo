@@ -44,8 +44,7 @@ public class StudentController {
     List<Student> students = service.searchStudentList();
     return students;
   }
-
-  // 年代を30代に限定して絞り込み検索
+  // 年齢を30代に限定して絞り込み検索
   @GetMapping("/over30")
   public List<Student> getStudentOverThirty() {
     return service.searchStudentOverThirty();
