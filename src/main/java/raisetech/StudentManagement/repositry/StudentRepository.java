@@ -14,11 +14,9 @@ public interface StudentRepository {
   @Select("SELECT * FROM students")
   List<Student> search();
 
+  @Select("SELECT * FROM students WHERE age >= 30")
+  List<Student> searchStudentOverThirty();
+
   @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCourses();
-
-  @Insert("INSERT INTO students (name, kana_name, nickName, email, area, age, sex, remark, isDeleted) " +
-      "VALUES (#{name}, #{kanaName}, #{nickName}, #{email}, #{area}, #{age}, #{sex}, #{remark}, false)")
-  @Options(useGeneratedKeys = true, keyProperty = "id") // DBがidを取得できるようにする
-  void registerStudent(Student student);
 }

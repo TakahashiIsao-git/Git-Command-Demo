@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
@@ -16,6 +18,7 @@ import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.service.StudentService;
 
 @RestController
+
 public class StudentController {
 
   private final StudentService service;
@@ -35,9 +38,9 @@ public class StudentController {
   }
 
   // 年代を30代に限定して絞り込み検索
-  @GetMapping("/30yearsOldStudentList")
-  public List<Student> get30yearsOldStudentList() {
-    return service.search30yearsOldStudentList();
+  @GetMapping("/over30")
+  public List<Student> getStudentOverThirty() {
+    return service.searchStudentOverThirty();
   }
 
   @GetMapping("/studentsCoursesList")

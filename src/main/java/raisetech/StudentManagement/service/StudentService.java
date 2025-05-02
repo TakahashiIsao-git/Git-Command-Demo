@@ -22,16 +22,11 @@ public class StudentService {
     return repository.search();
   }
 
-  public List<Student> search30yearsOldStudentList() {
-    return repository.search().stream()
-        .filter(student -> student.getAge() >=30 && student.getAge() <=39).toList();
+  public List<Student> searchStudentOverThirty() {
+    return repository.searchStudentOverThirty();
   }
 
   public List<StudentsCourses> searchStudentsCoursesList() {
     return repository.searchStudentsCourses();
-  }
-
-  public void registerStudent(StudentDetail studentDetail) {
-    repository.registerStudent(studentDetail.getStudent());
   }
 }
