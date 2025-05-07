@@ -23,8 +23,8 @@ public class StudentService {
   }
 
   // 年齢を30代に限定して絞り込み検索するためのメソッド
-  public List<Student> searchStudentOverThirty() {
-    return repository.searchStudentOverThirty();
+  public List<Student> searchStudentInThirty() {
+    return repository.searchStudentInThirty();
   }
 
   public List<StudentsCourses> searchStudentsCoursesList() {
