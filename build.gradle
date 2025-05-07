@@ -22,6 +22,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// 依存関係の追加:Apache Commons Lang
 	implementation 'org.apache.commons:commons-lang3:3.17.0'
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
 	//MySQLドライバ
 	runtimeOnly 'com.mysql:mysql-connector-j'

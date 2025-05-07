@@ -23,10 +23,9 @@ public class StudentService {
   }
 
   // 年齢を30代に限定して絞り込み検索するためのメソッド
-  public List<Student> searchStudentInThirty() {
-    return repository.searchStudentInThirty();
-  public List<Student> searchStudentOverThirty() {
-    return repository.searchStudentOverThirty();
+  public List<Student> searchStudentInThirties() {
+    return repository.searchStudentInThirties();
+
   // 絞り込みをして、年齢が30代の人のみ抽出する。抽出したリストをControllerに返す。
   public List<Student> search30yearsOldStudentList() {
     return repository.search().stream()

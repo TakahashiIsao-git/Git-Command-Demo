@@ -35,9 +35,6 @@ public class StudentController {
     this.converter = converter;
   }
 
-  @GetMapping("/studentList") /*HTTPのGETメソッドかつ[/studentList]のパスへのリクエストが
-  メソッドにひもづけられる。*/
-  public String getStudentList(Model model) { //ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
   // 全件検索
   @GetMapping("/studentList")
   public List<Student> getStudentList() {
@@ -46,6 +43,8 @@ public class StudentController {
   }
   // 年齢を30代に限定して絞り込み検索
   @GetMapping("/in30")
+  public List<Student> getStudentOverThirties() {
+    return service.searchStudentInThirties();
   public List<Student> getStudentOverThirty() {
     return service.searchStudentInThirty();
     return service.searchStudentOverThirty();
