@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
@@ -36,12 +35,13 @@ public class StudentController {
 
   @GetMapping("/studentList") /*HTTPのGETメソッドかつ[/studentList]のパスへのリクエストが
   メソッドにひもづけられる。*/
-  public String getStudentList(Model model) { //ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
+  public String getStudentList(Model model) { // ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
     List<Student> students = service.searchStudentList();
     List<StudentsCourses> studentsCourses = service.searchStudentsCoursesList();
-
+    // HTMLにデータを渡す
     model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
-    return "studentList"; //テンプレートファイルを特定するためのView名
+    //テンプレートファイルを特定するためのView名
+    return "studentList";
   }
 
   @GetMapping("/student/{id}")
@@ -50,6 +50,7 @@ public class StudentController {
     StudentDetail studentDetail = service.searchStudent(id);
     // HTMLにデータを渡す
     model.addAttribute("studentDetail", studentDetail);
+    // テンプレートファイルを特定するためのView名
     return "updateStudent";
   }
 
@@ -63,29 +64,33 @@ public class StudentController {
     StudentDetail studentDetail = new StudentDetail();
     studentDetail.setStudentsCourses(Arrays.asList(new StudentsCourses()));
     model.addAttribute("studentDetail", studentDetail);
-    return "registerStudent"; //View名
+    // テンプレートファイルを特定するためのView名
+    return "registerStudent";
   }
 
+  // 第15回演習課題：新規受講生情報を登録する処理を実装する。
   @PostMapping("/registerStudent")
   public String registerStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
     if (result.hasErrors()) {
+      // 入力エラーが発生すれば登録ページへ戻る
       return "registerStudent";
     }
     // System.out.println(studentDetail.getStudent().getName() + "さんが新規受講生として登録されました。");
-    // 第15回演習課題：①新規受講生情報を登録する処理を実装する。
     service.registerStudent(studentDetail);
-    // ②コース情報も一緒に登録できるよう実装する（コースは単体で可）。
+    // 登録後に受講生一覧ページへ
     return "redirect:/studentList";
   }
 
-  // 第16回演習課題：updateStudentとしてstudentListにあるID情報を受け取り、検索の処理を行なう。
+  // 第16回演習課題：updateStudentとしてstudentListにあるID情報を受け取り、検索の処理を行なう。（データが入っている状態なのでnewではない）
   @PostMapping("/updateStudent")
   public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
     if (result.hasErrors()) {
       // 入力エラーが発生すれば更新ページへ戻る
       return "updateStudent";
     }
-
+    // 受講生情報を更新する
+    service.updateStudent(studentDetail);
+    // 更新後に受講生一覧ページへ
+    return "redirect:/studentList";
   }
-  
 }

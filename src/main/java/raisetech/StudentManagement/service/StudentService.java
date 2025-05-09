@@ -49,5 +49,14 @@ public class StudentService {
       repository.registerStudentsCourses(studentsCourse);
     }
   }
-
-}
+  // 受講生更新：repositoryから情報を受け取る
+  @Transactional
+  public void updateStudent(StudentDetail studentDetail) {
+    // 単一の受講生の更新
+    repository.updateStudent(studentDetail.getStudent());
+    // TODO:コース情報登録
+    for (StudentsCourses studentsCourse : studentDetail.getStudentsCourses()) {
+      repository.updateStudentsCourses(studentsCourse);
+    }
+  }
+ }
