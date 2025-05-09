@@ -16,10 +16,11 @@ public interface StudentRepository {
   @Select("SELECT * FROM students WHERE id = #{id}")
      Student searchStudent(String id);
 
+  // 単一の受講生コースを検索する
   @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCoursesList();
 
-  //　単一の受講生コース情報を検索する
+  //　特定の受講生idに基づいた受講生コース情報を検索する
   @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
   List<StudentsCourses> searchStudentsCourses(Long studentId);
 
