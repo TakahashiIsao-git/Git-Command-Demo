@@ -16,8 +16,8 @@ public interface StudentRepository {
   List<Student> search();
 
   // 年齢を30代に限定して絞り込み検索する用
-  @Select("SELECT * FROM students WHERE age >= 30 && age < 40")
-  List<Student> searchStudentInThirty();
+  @Select("SELECT * FROM students WHERE age >= 30 && age <= 39")
+  List<Student> searchStudentInThirties();
 
   @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCourses();
