@@ -115,11 +115,11 @@ public class StudentController {
     return "redirect:/studentList";
   }
 
-  /* 論理削除した受講生情報を復元する
+  // 論理削除した受講生情報を復元する
   @PostMapping("/restoreStudent/{id}")
   public String restoreStudent(@PathVariable Long id) {
     service.restoreStudent(id);
     return "redirect:/studentList";
-  }*/
+  }
 
 }
