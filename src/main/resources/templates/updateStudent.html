@@ -44,7 +44,7 @@
     <input type="text" id="remark" th:field="*{student.remark}" >
   </div>
   <div>
-    <label for="isDeleted">キャンセル(削除)</label>
+    <label for="isDeleted">キャンセル</label>
     <input type="checkbox" id="isDeleted" th:field="*{student.isDeleted}" >
   </div>
   <div th:each="course, stat : *{studentsCourses}">
