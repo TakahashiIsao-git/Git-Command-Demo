@@ -19,7 +19,7 @@ public class StudentDetail {
   private int age;
   private String sex;
   private String remark;
-  private boolean isDeleted;
+  private Boolean isDeleted;
 
   private Student student;
 

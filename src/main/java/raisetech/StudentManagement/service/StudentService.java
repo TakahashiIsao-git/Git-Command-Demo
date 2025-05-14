@@ -65,5 +65,4 @@ public class StudentService {
   public void restoreStudent(Long id) {
     repository.restoreStudent(id);
   }
-
 }

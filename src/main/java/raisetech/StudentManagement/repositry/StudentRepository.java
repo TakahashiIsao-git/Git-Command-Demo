@@ -13,7 +13,7 @@ import raisetech.StudentManagement.data.StudentsCourses;
 public interface StudentRepository {
 
   // 受講生情報を検索する(論理削除のレコードを一覧画面に表示させない)
-  @Select("SELECT * FROM students WHERE isDeleted = false")
+  @Select("SELECT * FROM students")
   List<Student> search();
 
   // idに基づいた単一の受講生情報を検索する
@@ -49,4 +49,8 @@ public interface StudentRepository {
   // 受講生コース情報の更新処理　WHERE後のidをstudentIdに変更してはダメ（idの検索を繰り返したい）➡Repositoryを変えずに別の方法を考える！
   @Update("UPDATE students_courses SET course_name = #{courseName} WHERE id = #{id}")
   void updateStudentsCourses(StudentsCourses studentsCourses);
+
+  // 論理削除でキャンセルした受講生情報を復元する
+  @Update("UPDATE students SET isDeleted = false WHERE id = #{id}")
+  void restoreStudent(Long id);
 }
