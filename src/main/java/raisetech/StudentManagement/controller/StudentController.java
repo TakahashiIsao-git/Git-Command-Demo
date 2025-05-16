@@ -5,20 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
@@ -41,25 +35,13 @@ public class StudentController {
 
   @GetMapping("/studentList") /*HTTPのGETメソッドかつ[/studentList]のパスへのリクエストが
   メソッドにひもづけられる。*/
-  public String getStudentList(Model model) { //ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
+  public String getStudentList(Model model) { // ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
     List<Student> students = service.searchStudentList();
     List<StudentsCourses> studentsCourses = service.searchStudentsCoursesList();
     // HTMLにデータを渡す
     model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
     //テンプレートファイルを特定するためのView名
     return "studentList";
-    return "studentList"; //テンプレートファイルを特定するためのView名
-    model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses)); */
-    return service.search30yearsOldStudentList();
-  }
-
-  @GetMapping("/student/{id}")
-  public String getStudent(@PathVariable String id, Model model) {
-    // 受講生情報を検索する
-    StudentDetail studentDetail = service.searchStudent(id);
-    // HTMLにデータを渡す
-    model.addAttribute("studentDetail", studentDetail);
-    return "updateStudent";
   }
 
   @GetMapping("/student/{id}")
@@ -72,8 +54,8 @@ public class StudentController {
     return "updateStudent";
   }
 
-  @GetMapping("/studentsCoursesList")
-  public List<StudentsCourses> getStudentcoursesList() {
+  @GetMapping("/studentsCourseList")
+  public List<StudentsCourses> getStudentsCoursesList() {
     return service.searchStudentsCoursesList();
   }
 
@@ -85,11 +67,6 @@ public class StudentController {
     // テンプレートファイルを特定するためのView名
     return "registerStudent";
   }
-  @GetMapping("/studentsCoursesList")
-  public List<StudentsCourses> getStudentcoursesList() {
-    return service.searchStudentsCoursesList();
-  }
-}
 
   // 第15回演習課題：新規受講生情報を登録する処理を実装する。
   @PostMapping("/registerStudent")
@@ -123,5 +100,4 @@ public class StudentController {
     service.restoreStudent(id);
     return "redirect:/studentList";
   }
-
 }
