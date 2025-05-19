@@ -13,7 +13,7 @@ import raisetech.StudentManagement.data.StudentsCourses;
 public interface StudentRepository {
 
   // 受講生情報を検索する(論理削除のレコードを一覧画面に表示させない)
-  @Select("SELECT * FROM students WHERE isDeleted = false")
+  @Select("SELECT * FROM students")
   List<Student> search();
 
   // idに基づいた単一の受講生情報を検索する

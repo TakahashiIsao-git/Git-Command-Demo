@@ -35,9 +35,14 @@
     <td th:text="${studentDetail.student.age}">20</td>
     <td th:text="${studentDetail.student.sex}">男性</td>
     <td th:text="${studentDetail.student.remark}">特になし</td>
-    <td>
-      <input type="checkbox" th:checked="${studentDetail.student.isDeleted}">
+    <td th:if="${studentDetail.student.isDeleted}">
+      <form th:action="@{/restoreStudent/{id}(id=${studentDetail.student.id})}" method="post">
+        <button type="submit">復元</button>
+      </form>
     </td>
+    <td th:unless="${studentDetail.student.isDeleted}">
+      <span>有効</span>
+      　　</td>
   </tr>
   </tbody>
 </table>

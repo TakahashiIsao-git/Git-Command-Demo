@@ -48,16 +48,15 @@
     <input type="checkbox" id="isDeleted" th:field="*{student.isDeleted}" >
   </div>
   <div th:each="course, stat : *{studentsCourses}">
-    <label for="studentCourseId"
+    <label for="id"
            th:for="studentCourse.__${stat.index}__.id">受講コースID：</label>
-    <input type="text" id="studentCourseId" th:id="studentCourse.__${stat.index}__.id"
+    <input type="text" id="id" th:id="studentCourse.__${stat.index}__.id"
            th:field="*{studentsCourses[__${stat.index}__].id}" />
     <label for="courseName"
            th:for="studentCourse.__${stat.index}__.courseName">受講コース名： </label>
     <input type="text" id="courseName" th:id="studentCourse.__${stat.index}__.courseName"
            th:field="*{studentsCourses[__${stat.index}__].courseName}" />
-  </div>
-  <div>
+  </div>  <div>
     <button type="submit">更新</button>
   </div>
 </form>
