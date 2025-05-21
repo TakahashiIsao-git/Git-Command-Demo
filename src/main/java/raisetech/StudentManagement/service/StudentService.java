@@ -60,7 +60,7 @@ public class StudentService {
     }
   }
 
-  // 論理削除した受講生情報を復元する
+  // 論理削除した受講生情報を復元する処理
   @Transactional
   public void restoreStudent(Long id) {
     repository.restoreStudent(id);
