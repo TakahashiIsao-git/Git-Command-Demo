@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
@@ -20,8 +23,7 @@ import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repositry.StudentRepository;
 import raisetech.StudentManagement.service.StudentService;
 
-@Controller /*①コンポーネントスキャンされてBeanとして管理される。
-②SpringMVCに認知してもらい様々なアノテーションを利用できる。*/
+@RestController // ControllerからRestControllerに変換する,Webブラウザ上ではJSON変換した文字列を返すのみ
 public class StudentController {
 
   private final StudentService service;
@@ -35,13 +37,11 @@ public class StudentController {
 
   @GetMapping("/studentList") /*HTTPのGETメソッドかつ[/studentList]のパスへのリクエストが
   メソッドにひもづけられる。*/
-  public String getStudentList(Model model) { // ModelはSpringMVCが提供する型で,Viewに参照してもらうオブジェクトを格納できる。
+  public List<StudentDetail> getStudentList() { //String型からListに変更する、引数のModelを削除する
     List<Student> students = service.searchStudentList();
     List<StudentsCourses> studentsCourses = service.searchStudentsCoursesList();
-    // HTMLにデータを渡す
-    model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
-    //テンプレートファイルを特定するためのView名
-    return "studentList";
+    //コンバーターした結果を返す
+    return converter.convertStudentDetails(students, studentsCourses);
   }
 
   @GetMapping("/student/{id}")
@@ -83,15 +83,12 @@ public class StudentController {
 
   // 第16回演習課題：updateStudentとしてstudentListにあるID情報を受け取り、検索の処理を行なう。（データが入っている状態なのでnewではない）
   @PostMapping("/updateStudent")
-  public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-    if (result.hasErrors()) {
-      // 入力エラーが発生すれば更新ページへ戻る
-      return "updateStudent";
-    }
+  // ①画面用@ModelAttributeから@RequestBodyに変換する ②画面用BindingResult resultを削除する
+  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
     // 受講生情報を更新する
     service.updateStudent(studentDetail);
-    // 更新後に受講生一覧ページへ
-    return "redirect:/studentList";
+    // 返す内容がbodyに必要
+    return ResponseEntity.ok("更新処理が成功しました。");
   }
 
   // 論理削除した受講生情報を復元する処理
