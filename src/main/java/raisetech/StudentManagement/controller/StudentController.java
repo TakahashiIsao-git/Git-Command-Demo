@@ -23,35 +23,41 @@ import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repositry.StudentRepository;
 import raisetech.StudentManagement.service.StudentService;
 
-@RestController // ControllerからRestControllerに変換する,Webブラウザ上ではJSON変換した文字列を返すのみ
+/**
+ *  受講生の検索、登録や更新などを行なうRSET APIとして受け付けるControllerです。(責務)
+ */
+@RestController
 public class StudentController {
 
   private final StudentService service;
-  private final StudentConverter converter;
 
-  @Autowired //インジェクションする
-  public StudentController(StudentService service, StudentConverter converter) {
+  @Autowired
+  public StudentController(StudentService service) {
     this.service = service;
-    this.converter = converter;
   }
 
+  /**
+   * 受講生一覧検索です。(誰に向けてのメモかを考える、チームメンバーならば敬語は不要)
+   * 全件検索を行なうので、条件指定は行わないものになります。
+   *
+   * @return　受講生一覧(全件)
+   */
   @GetMapping("/studentList") /*HTTPのGETメソッドかつ[/studentList]のパスへのリクエストが
   メソッドにひもづけられる。*/
   public List<StudentDetail> getStudentList() { //String型からListに変更する、引数のModelを削除する
-    List<Student> students = service.searchStudentList();
-    List<StudentsCourses> studentsCourses = service.searchStudentsCoursesList();
-    //コンバーターした結果を返す
-    return converter.convertStudentDetails(students, studentsCourses);
+    return service.searchStudentList();
   }
 
+  /**
+   * 受講生検索です。
+   * IDに紐づく任意の受講生の情報を取得します。
+   *
+   * @param id 受講生ID
+   * @return　単一の受講生
+   */
   @GetMapping("/student/{id}")
-  public String getStudent(@PathVariable String id, Model model) {
-    // 受講生情報を検索する
-    StudentDetail studentDetail = service.searchStudent(id);
-    // HTMLにデータを渡す
-    model.addAttribute("studentDetail", studentDetail);
-    // テンプレートファイルを特定するためのView名
-    return "updateStudent";
+  public StudentDetail getStudent(@PathVariable String id) {
+    return service.searchStudent(id);
   }
 
   @GetMapping("/studentsCourseList")
@@ -59,39 +65,24 @@ public class StudentController {
     return service.searchStudentsCoursesList();
   }
 
-  @GetMapping("/newStudent") //要素が空っぽの状態
-  public String newStudent(Model model) {
-    StudentDetail studentDetail = new StudentDetail();
-    studentDetail.setStudentsCourses(Arrays.asList(new StudentsCourses()));
-    model.addAttribute("studentDetail", studentDetail);
-    // テンプレートファイルを特定するためのView名
-    return "registerStudent";
-  }
-
-  // 第15回演習課題：新規受講生情報を登録する処理を実装する。
   @PostMapping("/registerStudent")
-  public String registerStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-    if (result.hasErrors()) {
-      // 入力エラーが発生すれば登録ページへ戻る
-      return "registerStudent";
-    }
-    // System.out.println(studentDetail.getStudent().getName() + "さんが新規受講生として登録されました。");
-    service.registerStudent(studentDetail);
-    // 登録後に受講生一覧ページへ
-    return "redirect:/studentList";
+  public ResponseEntity<StudentDetail> registerStudent(@RequestBody StudentDetail studentDetail) {
+    StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
+    return ResponseEntity.ok(responseStudentDetail);
   }
 
-  // 第16回演習課題：updateStudentとしてstudentListにあるID情報を受け取り、検索の処理を行なう。（データが入っている状態なのでnewではない）
   @PostMapping("/updateStudent")
-  // ①画面用@ModelAttributeから@RequestBodyに変換する ②画面用BindingResult resultを削除する
   public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
-    // 受講生情報を更新する
     service.updateStudent(studentDetail);
-    // 返す内容がbodyに必要
     return ResponseEntity.ok("更新処理が成功しました。");
   }
 
-  // 論理削除した受講生情報を復元する処理
+  /**
+   * 論理削除した受講生情報の復元を行ないます。
+   *
+   * @param id 受講生ID
+   * @return 受講生一覧(全件)
+   */
   @PostMapping("/restoreStudent/{id}")
   public String restoreStudent(@PathVariable Long id) {
     service.restoreStudent(id);
