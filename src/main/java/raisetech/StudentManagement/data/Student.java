@@ -3,6 +3,9 @@ package raisetech.StudentManagement.data;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 受講生を扱うオブジェクト。
+ */
 @Getter
 @Setter
 public class Student {
