@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -22,7 +23,7 @@ import raisetech.StudentManagement.exception.TestException;
 import raisetech.StudentManagement.service.StudentService;
 
 /**
- *  受講生の検索、登録や更新などを行なうRSET APIとして受け付けるControllerです。(責務)
+ *  受講生の検索、登録や更新などを行なうRSET APIとして受け付けるControllerです。(Javadocコメント)
  */
 @Validated
 @RestController
@@ -41,6 +42,7 @@ public class StudentController {
    *
    * @return　受講生詳細一覧(全件)
    */
+  @Operation(summary = "一覧検索", description = "受講生の一覧を検索します。") // summary:一覧 descrption:詳細
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() throws TestException{
     throw new TestException("現在このAPIは利用できません。URLは「studentList」ではなく「students」を利用してください。");
@@ -53,12 +55,14 @@ public class StudentController {
    * @param id 受講生ID
    * @return　単一の受講生
    */
+  @Operation(summary = "詳細検索", description = "IDに紐づく任意の受講生情報を取得します。")
   @GetMapping("/student/{id}")
   public StudentDetail getStudent(
       @PathVariable @Pattern(regexp = "^\\d+$") String id) {
     return service.searchStudent(id);
   }
 
+  @Operation(summary = "受講生コース一覧", description = "受講生のコース情報一覧を取得します。")
   @GetMapping("/studentsCourseList")
   public List<StudentCourse> getStudentsCoursesList() {
     return service.searchStudentCourseList();
@@ -70,6 +74,7 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return 実行結果
    */
+  @Operation(summary = "受講生登録", description = "受講生の情報を登録します。")
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudent(@RequestBody @Valid StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
@@ -82,6 +87,7 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return 実行結果
    */
+  @Operation(summary = "受講生更新" ,description = "受講生の情報を更新します。")
   @PutMapping("/updateStudent") /** @PostMappingをPutMappingに機能変更 */
   public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDetail studentDetail) {
     service.updateStudent(studentDetail);
@@ -94,10 +100,10 @@ public class StudentController {
    * @param id 受講生ID
    * @return 受講生一覧(全件)
    */
+  @Operation(summary = "受講生復元", description = "論理削除された受講生情報を復元します。")
   @PostMapping("/restoreStudent/{id}")
   public String restoreStudent(@PathVariable Long id) {
     service.restoreStudent(id);
     return "redirect:/studentList";
   }
-
 }
