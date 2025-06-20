@@ -23,8 +23,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// Thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// OpenAPI Generator
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+
 	// 便利機能、ユーテイリティ
 	implementation 'org.apache.commons:commons-lang3:3.17.0'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

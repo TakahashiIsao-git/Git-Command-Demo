@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.data;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import lombok.Setter;
 /**
  * 受講生コース情報を扱うオブジェクト。
  */
+@Schema(description = "受講生コース情報")
 @Getter
 @Setter
 public class StudentCourse {
@@ -16,7 +18,7 @@ public class StudentCourse {
   private String id;
   private Long studentId;
 
-  @NotBlank(message = "コース名は必須です。")
+  @NotBlank
   private String courseName;
 
   @NotNull
