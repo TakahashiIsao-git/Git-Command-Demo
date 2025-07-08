@@ -17,8 +17,8 @@ import lombok.Setter;
 @Setter
 public class Student {
 
-  @NotBlank
-  @Pattern(regexp = "^\\d+$")
+  @NotNull(message = "IDは必須です。")
+  @Min(value = 1, message = "IDは1以上の数値である必要があります。")
   private Long id;
 
   @NotBlank
@@ -26,13 +26,17 @@ public class Student {
 
   @NotBlank
   private String kanaName;
+
+  @NotBlank
   private String nickName;
 
-  @Email
+  @NotBlank
+  @Email(message = "正しいメールアドレスを入力してください。")
   private String email;
 
   @NotBlank
   private String area;
+
   private int age;
 
   @NotBlank
