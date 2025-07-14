@@ -9,7 +9,7 @@ import raisetech.StudentManagement.controller.converter.StudentConverter;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
-import raisetech.StudentManagement.repositry.StudentRepository;
+import raisetech.StudentManagement.repository.StudentRepository;
 
 /**
  * 受講生情報を取り扱うサービスです。
@@ -47,7 +47,7 @@ public class StudentService {
    * @return　受講生詳細
    */
   public StudentDetail searchStudent(String id) {
-    Student student = repository.searchStudent(id);
+    Student student = repository.searchStudent(Long.valueOf(id));
     List<StudentCourse> studentCourse = repository.searchStudentCourse(student.getId());
     return new StudentDetail(student, studentCourse);
   }
@@ -82,7 +82,7 @@ public class StudentService {
    * @param studentCourse 受講生コース情報
    * @param student 受講生
    */
-  private void initStudentCourse(StudentCourse studentCourse, Student student) {
+  void initStudentCourse(StudentCourse studentCourse, Student student) {
     LocalDateTime now = LocalDateTime.now();
 
     studentCourse.setStudentId(Long.valueOf(String.valueOf(student.getId())));

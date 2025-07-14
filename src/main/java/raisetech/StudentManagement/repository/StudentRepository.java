@@ -26,7 +26,7 @@ public interface StudentRepository {
    * @param id 受講生ID
    * @return 受講生
    */
-  Student searchStudent(String id);
+  Student searchStudent(Long id);
 
   /**
    * 受講生のコース情報の全件検索を行ないます。

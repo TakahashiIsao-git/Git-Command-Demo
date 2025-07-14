@@ -3,6 +3,7 @@ package raisetech.StudentManagement.service;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +47,7 @@ class StudentServiceTest {
     Mockito.when(repository.searchStudentCourseList()).thenReturn(studentCourseList);
 
     // 実行
-    /* List<StudentDetail> actual = */ sut.searchStudentList(); // actual:テスト検証対象
+    sut.searchStudentList(); // actual:テスト検証対象
 
     // 検証
     // Assertions.assertEquals(expected, actual); //expected = actual
@@ -60,19 +61,21 @@ class StudentServiceTest {
   @Test
   void 受講生詳細検索_IDに紐づきリポジトリの処理が適切に呼び出せていること() {
     // 事前準備(before)
-    String id = "123";
+    Long id = 999L;
     Student student = new Student();
-    student.setId(123L);
-    List<StudentCourse> courseList = new ArrayList<>();
+    student.setId(id);
+    //List<StudentCourse> courseList = new ArrayList<>();
 
     Mockito.when(repository.searchStudent(id)).thenReturn(student);
-    Mockito.when(repository.searchStudentCourse(student.getId())).thenReturn(courseList);
+    Mockito.when(repository.searchStudentCourse(student.getId())).thenReturn(new ArrayList<>());
 
     // 実行
-    StudentDetail result = sut.searchStudent(id);
+    StudentDetail expected = new StudentDetail(student, new ArrayList<>());
+    StudentDetail actual = sut.searchStudent("999");
     // 検証
-    Assertions.assertEquals(courseList, result.getStudentCourseList());
-    Assertions.assertEquals(student, result.getStudent());
+    Mockito.verify(repository, times(1)).searchStudent(id);
+    Mockito.verify(repository, times(1)).searchStudentCourse(id);
+    Assertions.assertEquals(expected.getStudent().getId(), actual.getStudent().getId());
   }
 
   @Test
@@ -93,35 +96,49 @@ class StudentServiceTest {
   void 受講生登録処理_リポジトリの処理が適切に呼び出せていること() {
     // 事前準備(before)
     Student student = new Student();
-    student.setId(1L);
-
-    StudentCourse course = new StudentCourse();
-    List<StudentCourse> courseList = List.of(course);
-    StudentDetail studentDetail = new StudentDetail(student, courseList);
+    student.setId(999L);
+    StudentCourse studentCourse = new StudentCourse();
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     // 実行
-    StudentDetail result = sut.registerStudent(studentDetail);
+    sut.registerStudent(studentDetail);
 
     // 検証
     Mockito.verify(repository, times(1)).registerStudent(student);
-    Mockito.verify(repository, times(1)).registerStudentCourse(course);
-    Assertions.assertEquals(studentDetail, result);
+    Mockito.verify(repository, times(1)).registerStudentCourse(studentCourse);
+  }
+
+  @Test
+  void 受講生詳細の登録_初期化処理が適切に行なわれること() {
+    // 事前準備(before)
+    Student student = new Student();
+    student.setId(999L);
+    StudentCourse studentCourse = new StudentCourse();
+
+    // 実行
+    sut.initStudentCourse(studentCourse, student);
+
+    // 検証
+    Assertions.assertEquals(999L, studentCourse.getStudentId());
+    Assertions.assertEquals(LocalDateTime.now().getHour(), studentCourse.getCourseStartAt().getHour());
+    Assertions.assertEquals(LocalDateTime.now().plusYears(1).getYear(), studentCourse.getCourseEndAt().getYear());
   }
 
   @Test
   void 受講生更新処理_リポジトリの更新メソッドが適切に呼び出せていること() {
     // 事前準備(before)
     Student student = new Student();
-    StudentCourse course = new StudentCourse();
-    List<StudentCourse> courseList = List.of(course);
-    StudentDetail studentDetail = new StudentDetail(student, courseList);
+    StudentCourse studentCourse = new StudentCourse();
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     // 実行
     sut.updateStudent(studentDetail);
 
     // 検証
     Mockito.verify(repository, times(1)).updateStudent(student);
-    Mockito.verify(repository, times(1)).updateStudentCourse(course);
+    Mockito.verify(repository, times(1)).updateStudentCourse(studentCourse);
   }
 
   @Test

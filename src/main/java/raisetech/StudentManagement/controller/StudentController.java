@@ -57,9 +57,8 @@ public class StudentController {
    */
   @Operation(summary = "詳細検索", description = "IDに紐づく任意の受講生情報を取得します。")
   @GetMapping("/student/{id}")
-  public StudentDetail getStudent(
-      @PathVariable @Pattern(regexp = "^\\d+$") String id) {
-    return service.searchStudent(id);
+  public StudentDetail getStudent(@PathVariable Long id) {
+    return service.searchStudent(String.valueOf(id));
   }
 
   @Operation(summary = "受講生コース一覧", description = "受講生のコース情報一覧を取得します。")

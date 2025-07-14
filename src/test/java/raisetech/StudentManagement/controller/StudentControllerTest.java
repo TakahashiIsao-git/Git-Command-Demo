@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.assertj.MockMvcTester.MockMvcRequestBuilder;
@@ -57,8 +58,8 @@ class StudentControllerTest {
     // Mockito.when(service.searchStudentList()).thenReturn(List.of(new StudentDetail()));
 
     mockMvc.perform(MockMvcRequestBuilders.get("/studentList"))
-        .andExpect(status().isOk());
-        //.andExpect(content().json("[{\"student\":null,\"studentCourseList\":null}]"));
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
 
     verify(service, times(1)).searchStudentList();
   }
@@ -82,7 +83,7 @@ class StudentControllerTest {
 
   // 受講生IDがnullの場合のチェック
   @Test
-  void 受講生詳細の受講生IDがnullのとき入力チェックのエラーになること() {
+  void 受講生詳細の受講生IDがnullの時入力チェックに掛かること() {
     Student student = new Student();
     student.setId(null);
     student.setName("テスト太郎");
@@ -100,7 +101,7 @@ class StudentControllerTest {
 
   // 受講生IDが0の場合のチェック
   @Test
-  void 受講生詳細の受講生IDが0のとき入力チェックのエラーになること() {
+  void 受講生詳細の受講生IDが0の時入力チェックに掛かること() {
     Student student = new Student();
     student.setId(0L);
     student.setName("テスト太郎");
@@ -118,9 +119,9 @@ class StudentControllerTest {
 
   // Studentクラスの@Emailチェック
   @Test
-  void 受講生詳細のメールが不適当な型のときエラーになること() {
+  void 受講生詳細のメールが不適当な型の時に入力チェックに掛かること() {
     Student student = new Student();
-    student.setId(1L);
+    student.setId(12L);
     student.setName("テスト太郎");
     student.setKanaName("テストタロウ");
     student.setNickName("テスト");
@@ -132,27 +133,28 @@ class StudentControllerTest {
     assertThat(violations).extracting("message").containsOnly("正しいメールアドレスを入力してください。");
   }
 
-  // GetMappingのREST APIのテスト
+  // GetMappingのREST APIのテスト Validationテストを含む
   @Test
   void IDに紐づく任意の受講生詳細の一覧検索が実行と取得ができること() throws Exception {
     Student student = new Student();
-    student.setId(1L);
+    student.setId(12L);
     student.setName("テスト太郎");
     student.setKanaName("テストタロウ");
     student.setNickName("テスト");
     student.setEmail("test@example.com");
     student.setArea("愛知");
     student.setSex("男性");
+    // REST API用テストデータ　例：Long id = 999L;
 
     StudentDetail studentDetail = new StudentDetail();
     studentDetail.setStudent(student);
     studentDetail.setStudentCourseList(List.of());
-    Mockito.when(service.searchStudent(1L)).thenReturn(studentDetail);
+    Mockito.when(service.searchStudent("12")).thenReturn(studentDetail); // idから1Lに変更
 
-    mockMvc.perform(MockMvcRequestBuilders.get("/student/{id}", 1L))
+    mockMvc.perform(MockMvcRequestBuilders.get("/student/{id}", 12L))
         .andExpect(status().isOk());
 
-    Mockito.verify(service, times(1)).searchStudent(1L);
+    Mockito.verify(service, times(1)).searchStudent("12");
   }
 
   // GetMappingのREST APIのテスト
@@ -166,11 +168,14 @@ class StudentControllerTest {
     Mockito.verify(service, times(1)).searchStudentCourseList();
   }
 
-  // PostMappingのREST APIのテスト
+  /* PostMappingのREST APIのテスト StudentControllerクラスが@Valid付きのためダミーデータ作成
+     リクエストデータは適切に構築して入力チェックの検証も兼ねている。
+     本来であれば帰りは登録されたデータが入るが、モック化すると意味がないためレスポンスは作らない。
+   */
   @Test
-  void 受講生情報が適切に登録できること() throws Exception {
+  void 受講生詳細の登録が実行できて空で返ってくること() throws Exception {
     Student student = new Student();
-    student.setId(1L);
+    student.setId(12L);
     student.setName("テスト太郎");
     student.setKanaName("テストタロウ");
     student.setNickName("テスト");
@@ -183,7 +188,7 @@ class StudentControllerTest {
 
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setId("course-111");
-    studentCourse.setStudentId(1L);
+    studentCourse.setStudentId(12L);
     studentCourse.setCourseName("データベース設計コース");
     studentCourse.setCourseStartAt(LocalDateTime.of(2025, 7, 1, 10, 0));
     studentCourse.setCourseEndAt(LocalDateTime.of(2025, 12, 31, 18, 0));
@@ -192,21 +197,42 @@ class StudentControllerTest {
     studentDetail.setStudent(student);
     studentDetail.setStudentCourseList(List.of(studentCourse));
     // any():引数は何でもOK
-    Mockito.when(service.registerStudent(Mockito.any(StudentDetail.class))).thenReturn(studentDetail);
+    Mockito.when(service.registerStudent(Mockito.any())).thenReturn(studentDetail);
 
     mockMvc.perform(MockMvcRequestBuilders.post("/registerStudent")
-            .contentType("application/json") //JSON形式
+            .contentType(MediaType.APPLICATION_JSON) //JSON形式
             .content(objectMapper.writeValueAsString(studentDetail))) //JavaのオブジェクトをJSONに変換して送信する
+        /* Postman実行前にテスト実行後返ってくるであろうデータ形式を作成する。
+        """
+          {
+            "student": {
+              "name" : "テスト太郎",
+              "kanaName" : "テストタロウ",
+              "nickName" : "テスト",
+              "email" : "test@example.com",
+              "area" : "愛知",
+              "age" : 25,
+              "sex" : "男性",
+              "remark" : ""
+            },
+            "studentCourseList" : [
+              {
+                "courseName" : "Javaコース"
+              }
+            ]
+           }
+        """
+         */
         .andExpect(status().isOk());
 
-    Mockito.verify(service, times(1)).registerStudent(Mockito.any(StudentDetail.class));
+    Mockito.verify(service, times(1)).registerStudent(Mockito.any());
   }
 
-  // PutMappingのREST APIのテスト
+  // PutMappingのREST APIのテスト StudentControllerクラスが@Valid付きのためダミーデータ作成
   @Test
-  void 受講生情報が適切に更新できること() throws Exception {
+  void 受講生情報の更新が実行できて空で返ってくること() throws Exception {
     Student student = new Student();
-    student.setId(1L);
+    student.setId(12L);
     student.setName("テスト太郎");
     student.setKanaName("テストタロウ");
     student.setNickName("テスト");
@@ -219,7 +245,7 @@ class StudentControllerTest {
 
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setId("course-111");
-    studentCourse.setStudentId(1L);
+    studentCourse.setStudentId(12L);
     studentCourse.setCourseName("データベース設計コース");
     studentCourse.setCourseStartAt(LocalDateTime.of(2025, 7, 1, 10, 0));
     studentCourse.setCourseEndAt(LocalDateTime.of(2025, 12, 31, 18, 0));
@@ -229,13 +255,47 @@ class StudentControllerTest {
     studentDetail.setStudentCourseList(List.of(studentCourse));
 
     mockMvc.perform(MockMvcRequestBuilders.put("/updateStudent")
-          .contentType("application/json")
-          .content(objectMapper.writeValueAsString(studentDetail)))
-        .andExpect(status().isOk())
-            .andExpect(content().string("更新処理が成功しました。"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(studentDetail)))
+        /* studentDetailの内容をJSON形式で表示
+        """
+          {
+           "student": {
+              "id" : "12L",
+              "name" : "テスト太郎",
+              "kanaName" : "テストタロウ",
+              "nickName" : "タロウ",
+              "email" : "test@example.com",
+              "area" : "愛知",
+              "age" : 30,
+              "sex" : "男性",
+              "remark" : ""
+            },
+            "studentCourseList" : [
+              {
+                "id" : "13",
+                "studentId" : 12L,
+                "courseName" : "Javaコース",
+                "courseStartAt" : "2025-07-01T10:00:00",
+                "courseEndAt" : "2025-12-31T18:00:00"
+              }
+            ]
+          }
+        """
+         */
+        .andExpect(status().isOk());
+    // .andExpect(content().string("更新処理が成功しました。"));
 
     Mockito.verify(service, times(1)).updateStudent(Mockito.any());
   }
+  /*
+  @Test
+  void 受講生詳細の例外APIが実行できてステータスが400で返ってくること() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.get("/exception"))
+        .andExpect(status().is4xxClientError())
+        .andExpect(content().string("このAPIは現在利用できません。古いURLとなっています。"));
+  }
+   */
 
   // PostMappingのREST APIのテスト
   @Test
