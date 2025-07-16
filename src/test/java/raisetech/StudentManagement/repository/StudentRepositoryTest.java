@@ -38,6 +38,14 @@ class StudentRepositoryTest {
     assertThat(actual.getSex()).isEqualTo("男性");
   }
 
+  // ①異常系テスト
+  @Test
+  void 存在しない受講生IDを指定した時にnullが返ってくること() {
+    Student actual = sut.searchStudent(999L);
+
+    assertThat(actual).isNull();
+  }
+
   @Test
   void 受講生コース情報の全件検索が実行できること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
@@ -57,6 +65,14 @@ class StudentRepositoryTest {
     assertThat(actual.get(0).getCourseName()).isEqualTo("Javaコース");
     assertThat(actual.get(1).getCourseName()).isEqualTo("AI・機械学習コース");
     assertThat(actual.get(2).getCourseName()).isEqualTo("ネットワークコース");
+  }
+
+  // ②異常系テスト
+  @Test
+  void 存在しない受講生IDに紐づく受講生コースの検索で空のリストが返ってくること() {
+    List<StudentCourse> actual = sut.searchStudentCourse(999L);
+
+    assertThat(actual).isEmpty();
   }
 
   @Test
@@ -81,6 +97,19 @@ class StudentRepositoryTest {
     assertThat(actual.size()).isEqualTo(6);
   }
 
+  // ③DBでNot NULL制約がある項目をnullした状態でデータ登録をした時にエラーが発生する（異常系テスト）
+  @Test
+  void 受講生情報の必須項目がnullの受講生を登録する時に例外がスローされること() {
+    Student student = new Student();
+    student.setKanaName("タロ");
+    // nameをnull(必須項目)
+    // emailをnull(必須項目)
+
+    org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
+      sut.registerStudent(student);
+    });
+  }
+
   @Test
   void 受講生コース情報の登録が実行できること() {
     StudentCourse studentCourse = new StudentCourse();
@@ -99,6 +128,20 @@ class StudentRepositoryTest {
     assertThat(actual.get(2).getCourseName()).isEqualTo("セキュリティコース");
   }
 
+  // ④DBでNot NULL制約がある項目をnullした状態で受講生コースのデータ登録をした時にエラーが発生する（異常系テスト）
+  @Test
+  void 受講生コース情報の必須項目がnullの受講生コースが登録できず例外がスローされること() {
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setStudentId(1L);
+    // courseNameをnull(必須項目)
+    studentCourse.setCourseStartAt(LocalDateTime.now());
+    studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
+
+    org.junit.jupiter.api.Assertions.assertThrows(Exception.class, () -> {
+      sut.registerStudentCourse(studentCourse);
+    });
+  }
+
   @Test
   void 受講生の更新が実行できること() {
     Student student = sut.searchStudent(4L);
@@ -113,6 +156,18 @@ class StudentRepositoryTest {
     System.out.println(actual); */
     assertThat(actual.getArea()).isEqualTo("長崎");
     assertThat(actual.getAge()).isEqualTo(24);
+  }
+
+  // ⑤異常系テスト
+  @Test
+  void 存在しない受講生の更新時には例外がスローされないこと() {
+    Student student = new Student();
+    student.setId(999L); // 存在しないID
+    student.setName("テスト太郎");
+    student.setKanaName("タロウ");
+    student.setEmail("taro@example.com");
+
+    sut.updateStudent(student);
   }
 
   @Test
@@ -130,6 +185,19 @@ class StudentRepositoryTest {
     assertThat(actual.get(0).getCourseName()).isEqualTo("改訂版ネットワークコース");
   }
 
+  // ⑥異常系テスト
+  @Test
+  void 存在しない受講生コース情報の更新時には例外がスローされないこと() {
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setId("999");
+    studentCourse.setStudentId(1L);
+    studentCourse.setCourseName("C++プログラムコース");
+    studentCourse.setCourseStartAt(LocalDateTime.now());
+    studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
+
+    sut.updateStudentCourse(studentCourse);
+  }
+
   @Test
   void 論理削除された受講生の復元が実行できること() {
     Student student = sut.searchStudent(2L);
@@ -142,5 +210,11 @@ class StudentRepositoryTest {
     /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.getIsDeleted()).isFalse();
+  }
+
+  // ⑦異常系テスト
+  @Test
+  void 存在しない受講生IDの復元処理の時に例外がスローされないこと() {
+    sut.restoreStudent(999L);
   }
 }
