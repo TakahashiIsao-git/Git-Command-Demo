@@ -24,10 +24,10 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 任意のIDに紐づく受講生検索が実行できること() {
+  void 任意の受講生IDに紐づく受講生検索が実行できること() {
     Student actual = sut.searchStudent(1L);
 
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.getName()).isEqualTo("山田太郎");
     assertThat(actual.getKanaName()).isEqualTo("ヤマダタロウ");
@@ -42,16 +42,16 @@ class StudentRepositoryTest {
   void 受講生コース情報の全件検索が実行できること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
 
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(9);
   }
 
   @Test
-  void 任意のIDに紐づく受講生コースの検索が実行できること() {
+  void 任意の受講生IDに紐づく受講生コースの検索が実行できること() {
     List<StudentCourse> actual = sut.searchStudentCourse(3L);
 
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(3);
     assertThat(actual.get(0).getCourseName()).isEqualTo("Javaコース");
@@ -76,7 +76,7 @@ class StudentRepositoryTest {
 
     List<Student> actual = sut.search();
 
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(6);
   }
@@ -93,7 +93,7 @@ class StudentRepositoryTest {
 
     List<StudentCourse> actual = sut.searchStudentCourse(1L);
 
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(3);
     assertThat(actual.get(2).getCourseName()).isEqualTo("セキュリティコース");
@@ -139,7 +139,7 @@ class StudentRepositoryTest {
     sut.restoreStudent(2L);
 
     Student actual = sut.searchStudent(2L);
-    /* データの更新内容の確認
+    /* データの内容の確認
     System.out.println(actual); */
     assertThat(actual.getIsDeleted()).isFalse();
   }
