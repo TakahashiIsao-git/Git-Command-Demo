@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+// import lombok.ToString;
 
 /**
  * 受講生コース情報を扱うオブジェクト。
@@ -13,9 +14,10 @@ import lombok.Setter;
 @Schema(description = "受講生コース情報")
 @Getter
 @Setter
+// @ToString
 public class StudentCourse {
 
-  private String id;
+  private int id;
   private Long studentId;
 
   @NotBlank

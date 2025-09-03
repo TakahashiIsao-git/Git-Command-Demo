@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseApplicationStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.StudentCourseDetail;
 import raisetech.StudentManagement.domain.StudentDetail;
 import raisetech.StudentManagement.repository.StudentRepository;
 
@@ -36,20 +38,35 @@ public class StudentService {
   public List<StudentDetail> searchStudentList() {
     List<Student> studentList = repository.search();
     List<StudentCourse> studentCourseList = repository.searchStudentCourseList();
-    return converter.convertStudentDetails(studentList, studentCourseList);
+    List<CourseApplicationStatus> applicationStatusList = repository.searchCourseApplicationStatusList();
+    return converter.convertStudentDetails(studentList, studentCourseList, applicationStatusList);
   }
 
   /**
    * 受講生詳細の検索です。
-   * IDに紐づく任意の受講生の情報を取得した後、その受講生に紐づく受講生コース情報を取得して設定します。
+   * IDに紐づく任意の受講生の情報を取得した後、
+   * 関連するすべての受講生コース情報および各コースに対する申込状況（CourseApplicationStatus）も合わせて取得・設定します。
    *
    * @param id 受講生ID
-   * @return　受講生詳細
+   * @return　受講生詳細（１人の受講生・受講生コース・申込状況）
    */
   public StudentDetail searchStudent(String id) {
     Student student = repository.searchStudent(Long.valueOf(id));
-    List<StudentCourse> studentCourse = repository.searchStudentCourse(student.getId());
-    return new StudentDetail(student, studentCourse);
+    List<StudentCourse> studentCourseDetailList = repository.searchStudentCourse(student.getId());
+
+    // 受講生が登録しているすべてのコースについて、対応する申込状況も取得する処理
+    // 受講生コースのリストをストリーム化(順番に処理)
+    List<CourseApplicationStatus> applicationStatusList = studentCourseDetailList.stream()
+        // コースごとに申込状況をDBから取得する
+        .map(studentCourse -> repository.searchCourseApplicationStatus(studentCourse.getId()))
+        // null(申込状況が登録されていないコース)を除外する処理
+        .filter(courseApplicationStatus -> courseApplicationStatus != null)
+        .toList();
+
+    // １人の受講生+受講生コース一覧+申込状況一覧に基づき、StudentDetailオブジェクト(詳細情報)を作成して返す。
+    // １人の受講生のみなので、リストの先頭get(0)で１件だけ抽出する
+    return converter.convertStudentDetails(List.of(student), studentCourseDetailList, applicationStatusList).get(0);
+    // return new StudentDetail(student, studentCourseList);
   }
 
   public  List<StudentCourse> searchStudentCourseList() {
@@ -58,22 +75,42 @@ public class StudentService {
 
   /**
    * 受講生詳細の登録です。
-   * 受講生と受講生コース情報を個別に登録し、受講生コース情報には受講生情報を紐づける値とコース開始日、コース終了日を設定します。
+   * 受講生情報、受講生コース情報、申込状況情報をまとめて登録します。
+   * 受講生コース情報にはコース開始日、コース終了日を設定し、申込状況情報には受講生コースIDを紐づけます。
    *
    * @param studentDetail 受講生詳細
-   * @return 登録情報を付与した受講生詳細
+   * @return 申込情報を付与した受講生詳細
    */
   @Transactional
   public StudentDetail registerStudent(StudentDetail studentDetail) {
-    Student student = studentDetail.getStudent(); //準備する
+    Student student = studentDetail.getStudent();
+    student.setIsDeleted(false);
+    repository.registerStudent(student); // student.id がセットされる
 
-    repository.registerStudent(student); //やりたい処理
-    // TODO:コース情報登録
-    studentDetail.getStudentCourseList().forEach(studentCourse -> {
-      initStudentCourse(studentCourse, student);
+    // 受講生コース詳細一覧を１件ずつ取得して対応する受講生コースの登録と申込状況（初期値：仮申込）の登録を行なうループ処理
+    studentDetail.getStudentCourseDetailList().forEach(studentCourseDetail -> {
+      // 受講生コース詳細から実際の受講生コースを取得する
+      StudentCourse studentCourse = studentCourseDetail.getStudentCourse();
+      initStudentCourse(studentCourse, student); // studentIdをセット
+      // student_courseテーブルにINSERT（申込状況の初回登録 studentCourse.id がセットされる）
       repository.registerStudentCourse(studentCourse);
+
+      // 申込状況の初期値「仮申込」を登録する
+      CourseApplicationStatus applicationStatus = new CourseApplicationStatus();
+      applicationStatus.setStudentCourseId(studentCourse.getId());
+      applicationStatus.setApplicationStatus("仮申込"); // 初期ステータス
+      LocalDateTime now = LocalDateTime.now();
+      applicationStatus.setCreatedAt(now);
+      applicationStatus.setLastUpdatedAt(now);
+      applicationStatus.setLastUpdatedBy("system"); // systemは更新者による自動処理
+      applicationStatus.setNotes("初回説明会に参加予定");
+      applicationStatus.setIsDeleted(false);
+      // DBのcourse_application_statusテーブルにデータを登録（INSERT）する
+      repository.registerCourseApplicationStatus(applicationStatus);
+      // Javaオブジェクトに反映
+      studentCourseDetail.setCourseApplicationStatus(applicationStatus);
     });
-    return studentDetail; //結果
+    return studentDetail;
   }
 
   /**
@@ -98,9 +135,24 @@ public class StudentService {
   @Transactional
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
-    // TODO:コース情報登録
-    studentDetail.getStudentCourseList()
-        .forEach(studentCourse -> repository.updateStudentCourse(studentCourse));
+
+    studentDetail.getStudentCourseDetailList().forEach(studentCourseDetail -> {
+         StudentCourse studentCourse = studentCourseDetail.getStudentCourse();
+          repository.updateStudentCourse(studentCourse);
+
+          CourseApplicationStatus courseApplicationStatus = studentCourseDetail.getCourseApplicationStatus();
+          repository.updateCourseApplicationStatus(studentCourse.getId(), courseApplicationStatus);
+    });
+  }
+
+  /**
+   * 受講生情報の論理削除を行ないます。
+   *
+   * @param id 受講生ID
+   */
+  @Transactional
+  public void deleteStudent(Long id) {
+    repository.deleteStudent(id);
   }
 
   /**
@@ -111,5 +163,57 @@ public class StudentService {
   @Transactional
   public void restoreStudent(Long id) {
     repository.restoreStudent(id);
+  }
+
+  /**
+   * 申込状況詳細の一覧検索です。
+   * 全件検索を行なうので、条件指定は行わないものになります。
+   *
+   * @return 申込状況一覧(全件)
+   */
+  @Transactional
+  public List<CourseApplicationStatus> searchCourseApplicationStatusList() {
+    return repository.searchCourseApplicationStatusList();
+  }
+
+  /**
+   * 申込状況詳細の検索です。
+   *
+   * @param studentCourseId 受講生コースID
+   * @return 受講生コースIDに紐づく申込状況情報
+   */
+  @Transactional
+  public CourseApplicationStatus searchCourseApplicationStatus(Integer studentCourseId) {
+    return repository.searchCourseApplicationStatus(studentCourseId);
+  }
+
+  /**
+   * 申込状況詳細の登録です。
+   *
+   * @param courseApplicationStatus 申込状況
+   */
+  @Transactional
+  public void registerCourseApplicationStatus(CourseApplicationStatus courseApplicationStatus) {
+    repository.registerCourseApplicationStatus(courseApplicationStatus);
+  }
+
+  /**
+   * 申込状況詳細の更新です。
+   *
+   * @param courseApplicationStatus 申込状況
+   */
+  @Transactional
+  public void updateCourseApplicationStatus(Integer studentCourseId, CourseApplicationStatus courseApplicationStatus) {
+    repository.updateCourseApplicationStatus(studentCourseId, courseApplicationStatus);
+  }
+
+  /**
+   * 申込状況詳細の論理削除です。
+   *
+   * @param id 申込状況ID
+   */
+  @Transactional
+  public void deleteCourseApplicationStatus(Integer id) {
+    repository.deleteCourseApplicationStatus(id);
   }
 }

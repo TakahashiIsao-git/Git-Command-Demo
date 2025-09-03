@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.data;
 
+// import lombok.ToString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -15,10 +16,9 @@ import lombok.Setter;
 @Schema(description = "受講生")
 @Getter
 @Setter
+// @ToString
 public class Student {
 
-  @NotNull(message = "IDは必須です。")
-  @Min(value = 1, message = "IDは1以上の数値である必要があります。")
   private Long id;
 
   @NotBlank
@@ -30,7 +30,7 @@ public class Student {
   @NotBlank
   private String nickName;
 
-  @NotBlank
+  @NotBlank(message = "メールは必須です。")
   @Email(message = "正しいメールアドレスを入力してください。")
   private String email;
 

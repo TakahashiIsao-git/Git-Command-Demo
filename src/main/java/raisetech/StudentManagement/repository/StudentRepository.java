@@ -2,6 +2,8 @@ package raisetech.StudentManagement.repository;
 
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import raisetech.StudentManagement.data.CourseApplicationStatus;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -14,17 +16,16 @@ public interface StudentRepository {
   /**
    * 受講生の全件検索を行ないます。
    *
-   * @return 受講生一覧(全件)
+   * @return 受講生の一覧情報(全件)
    */
   /** 論理削除のレコードを一覧画面に表示させない */
-  // @Select("SELECT * FROM students WHERE isDeleted = false")
   List<Student> search();
 
   /**
    * 受講生の検索を行ないます。
    *
    * @param id 受講生ID
-   * @return 受講生
+   * @return 受講生情報
    */
   Student searchStudent(Long id);
 
@@ -44,6 +45,21 @@ public interface StudentRepository {
   List<StudentCourse> searchStudentCourse(Long studentId);
 
   /**
+   *  申込状況情報の全件検索を行ないます。
+   *
+   * @return 申込状況のリスト情報（全件）
+   */
+  List<CourseApplicationStatus> searchCourseApplicationStatusList();
+
+  /**
+   *  受講生コースIDに紐づく申込状況情報を検索します。
+   *
+   * @param studentCourseId 受講生コースID
+   * @return 受講生コースIDに紐づく申込状況情報（該当しなければnullも可）
+   */
+  CourseApplicationStatus searchCourseApplicationStatus(@Param("studentCourseId") Integer studentCourseId);
+
+  /**
    * 受講生を新規登録します。IDに関しては自動採番を行なう。
    *
    * @param student 受講生
@@ -58,6 +74,13 @@ public interface StudentRepository {
   void registerStudentCourse(StudentCourse studentCourse);
 
   /**
+   * 受講生コースの申込状況情報を新規登録します。IDに関しては自動採番を行なう。
+   *
+   * @param courseApplicationStatus 申込状況情報
+   */
+  void registerCourseApplicationStatus(CourseApplicationStatus courseApplicationStatus);
+
+  /**
    * 受講生を更新します。
    *
    * @param student 受講生
@@ -69,8 +92,28 @@ public interface StudentRepository {
    *
    * @param studentCourse 受講生コース情報
    */
-  // 受講生コース情報の更新処理
+  // 受講生コース情報の更新処理 Testクラス作成の場合はデータの内容が更新されたことも確認する！searchを使用
   void updateStudentCourse(StudentCourse studentCourse);
+
+  /**
+   * 任意の受講生コースIDに紐づく申込状況情報を更新します。
+   * 更新対象は申込状況、更新者、メモです。
+   *
+   * @param studentCourseId 対象の受講生コースID
+   * @param courseApplicationStatus 更新内容(申込状況、更新者、メモを含む）
+   */
+  void updateCourseApplicationStatus(
+      // 複数の引数を設定するために@Paramをセット
+      @Param("studentCourseId") Integer studentCourseId,
+      @Param("courseApplicationStatus") CourseApplicationStatus courseApplicationStatus);
+
+  /**
+   * 論理削除された受講生情報を削除フラグ付きで更新します。
+   * 物理削除ではありません。
+   *
+   * @param id 受講生ID
+   */
+  void deleteStudent(Long id);
 
   /**
    * 論理削除でキャンセルした受講生情報を復元します。
@@ -78,4 +121,12 @@ public interface StudentRepository {
    * @param id 受講生ID
    */
   void restoreStudent(Long id);
+
+  /**
+   * 論理削除された申込状況情報を削除フラグ付きで更新します。
+   * 物理削除ではありません。
+   *
+   * @param id 論理削除対象の申込状況ID
+   */
+  void deleteCourseApplicationStatus(Integer id);
 }
