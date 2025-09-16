@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class StudentCourse {
 
-  private String id;
+  private int id;
   private Long studentId;
 
   @NotBlank
@@ -26,4 +26,28 @@ public class StudentCourse {
 
   @NotNull
   private LocalDateTime courseEndAt;
+
+  /** 引数付きコンストラクタ 本番用(idなし) */
+  public StudentCourse(
+      Long studentId,
+      String courseName,
+      LocalDateTime courseStartAt,
+      LocalDateTime courseEndAt
+  ) {
+    this.studentId = studentId;
+    this.courseName = courseName;
+    this.courseStartAt = courseStartAt;
+    this.courseEndAt = courseEndAt;
+  }
+
+  /** 引数付きコンストラクタ テスト専用(idあり) */
+  public StudentCourse(int id, Long studentId, String courseName,
+      LocalDateTime courseStartAt, LocalDateTime courseEndAt) {
+    this(studentId, courseName, courseStartAt, courseEndAt);
+    this.id = id;
+  }
+
+  /** JPA用にデフォルトコンストラクタ */
+  public StudentCourse() {}
+
 }
