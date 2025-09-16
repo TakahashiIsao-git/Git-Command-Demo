@@ -25,15 +25,13 @@ class StudentRepositoryTest {
   void 受講生の全件検索が実行できること() {
     List<Student> actual = sut.search();
 
-    assertThat(actual.size()).isEqualTo(5);
+    assertThat(actual.size()).isEqualTo(11);
   }
 
   @Test
   void 指定した受講生IDに紐づく受講生検索が実行できること() {
     Student actual = sut.searchStudent(1L);
 
-    /* データの内容の確認
-    System.out.println(actual); */
     assertThat(actual.getName()).isEqualTo("山田太郎");
     assertThat(actual.getKanaName()).isEqualTo("ヤマダタロウ");
     assertThat(actual.getNickName()).isEqualTo("タロ");
@@ -54,17 +52,13 @@ class StudentRepositoryTest {
   void 受講生コース情報の全件検索が実行できること() {
     List<StudentCourse> actual = sut.searchStudentCourseList();
 
-    /* データの内容の確認
-    System.out.println(actual); */
-    assertThat(actual.size()).isEqualTo(9);
+    assertThat(actual.size()).isEqualTo(10);
   }
 
   @Test
   void 指定した受講生IDに紐づく受講生コースの検索が実行できること() {
     List<StudentCourse> actual = sut.searchStudentCourse(3L);
 
-    /* データの内容の確認
-    System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(3);
     assertThat(actual.get(0).getCourseName()).isEqualTo("Javaコース");
     assertThat(actual.get(1).getCourseName()).isEqualTo("AI・機械学習コース");
@@ -82,7 +76,7 @@ class StudentRepositoryTest {
   void 申込状況情報の全件検索が実行できること() {
     List<CourseApplicationStatus> actual = sut.searchCourseApplicationStatusList();
 
-    assertThat(actual.size()).isEqualTo(9);
+    assertThat(actual.size()).isEqualTo(10);
   }
 
   @Test // IDに紐づく申込状況情報が検索でき、かつ一部の値が正しいか確認する
@@ -115,24 +109,22 @@ class StudentRepositoryTest {
 
   @Test
   void 受講生の登録が実行できること() {
-    Student student = new Student();
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setAge(25);
-    student.setSex("男性");
-    student.setRemark("");
-    student.setIsDeleted(false);
-
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "test@example.com",
+    "愛知",
+    25,
+    "男性",
+    "",
+    false
+    );
     sut.registerStudent(student);
 
     List<Student> actual = sut.search();
 
-    /* データの内容の確認
-    System.out.println(actual); */
-    assertThat(actual.size()).isEqualTo(6);
+    assertThat(actual.size()).isEqualTo(12);
   }
 
   // NotNull制約があるカラムをnullにして登録しようとすると例外が発生すること
@@ -150,18 +142,16 @@ class StudentRepositoryTest {
 
   @Test
   void 受講生コース情報の登録が実行できること() {
-    StudentCourse studentCourse = new StudentCourse();
-    studentCourse.setStudentId(1L);
-    studentCourse.setCourseName("セキュリティコース");
-    studentCourse.setCourseStartAt(LocalDateTime.of(2025, 6, 1, 9, 0, 0));
-    studentCourse.setCourseEndAt(LocalDateTime.of(2025, 10, 1, 17, 0, 0));
-
+    StudentCourse studentCourse = new StudentCourse(
+    1L,
+    "セキュリティコース",
+    LocalDateTime.of(2025, 6, 1, 9, 0, 0),
+    LocalDateTime.of(2025, 10, 1, 17, 0, 0)
+    );
     sut.registerStudentCourse(studentCourse);
 
     List<StudentCourse> actual = sut.searchStudentCourse(1L);
 
-    /* データの内容の確認
-    System.out.println(actual); */
     assertThat(actual.size()).isEqualTo(3);
     assertThat(actual).extracting(StudentCourse::getCourseName)
         .contains("セキュリティコース");
@@ -183,11 +173,15 @@ class StudentRepositoryTest {
 
   @Test // 正常にデータベースへ登録できるか
   void 申込状況情報の登録が実行できること() {
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
-    courseApplicationStatus.setStudentCourseId(101);
-    courseApplicationStatus.setApplicationStatus("仮申込");
-    courseApplicationStatus.setLastUpdatedBy("admin");
-    courseApplicationStatus.setNotes("初回問い合わせあり");
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    101,
+    "仮申込",
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+    "admin",
+    "初回問い合わせあり",
+    false
+    );
 
     sut.registerCourseApplicationStatus(courseApplicationStatus);
 
@@ -220,8 +214,6 @@ class StudentRepositoryTest {
 
     Student actual = sut.searchStudent(4L);
 
-    /* データの更新内容の確認
-    System.out.println(actual); */
     assertThat(actual.getArea()).isEqualTo("長崎");
     assertThat(actual.getAge()).isEqualTo(24);
   }
@@ -247,8 +239,6 @@ class StudentRepositoryTest {
 
     List<StudentCourse> actual = sut.searchStudentCourse(5L);
 
-    /* データの更新内容の確認
-    System.out.println(actual); */
     assertThat(actual.get(0).getCourseName()).isEqualTo("改訂版ネットワークコース");
   }
 
@@ -298,15 +288,17 @@ class StudentRepositoryTest {
   @Test
   void 受講生の論理削除が実行できること() {
     // 対象の受講生を確認
-    Student student = new Student();
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setAge(25);
-    student.setSex("男性");
-    student.setRemark("テスト用データ");
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "test@example.com",
+    "愛知",
+    25,
+    "男性",
+    "テスト用データ",
+    false
+    );
     sut.registerStudent(student);
 
     Student expected = sut.searchStudent(student.getId());
@@ -325,16 +317,17 @@ class StudentRepositoryTest {
   @Test
   @BeforeEach
   void 論理削除された受講生の復元が実行できること() {
-    Student student = new Student();
-    student.setName("江藤由紀子");
-    student.setKanaName("エトウユキコ");
-    student.setNickName("ユキコ");
-    student.setEmail("yukiko@example.com");
-    student.setArea("奈良");
-    student.setAge(46);
-    student.setSex("女性");
-    student.setRemark("");
-    student.setIsDeleted(true); // 最初から論理削除状態として設定
+    Student student = new Student(
+    "江藤由紀子",
+    "エトウユキコ",
+    "ユキコ",
+    "yukiko@example.com",
+    "奈良",
+    46,
+    "女性",
+    "",
+    true // 最初から論理削除状態として設定
+    );
     sut.registerStudent(student);
 
     // 登録したIDを取得

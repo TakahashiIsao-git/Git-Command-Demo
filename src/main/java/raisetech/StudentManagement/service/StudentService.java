@@ -63,10 +63,7 @@ public class StudentService {
         .filter(courseApplicationStatus -> courseApplicationStatus != null)
         .toList();
 
-    // １人の受講生+受講生コース一覧+申込状況一覧に基づき、StudentDetailオブジェクト(詳細情報)を作成して返す。
-    // １人の受講生のみなので、リストの先頭get(0)で１件だけ抽出する
     return converter.convertStudentDetails(List.of(student), studentCourseDetailList, applicationStatusList).get(0);
-    // return new StudentDetail(student, studentCourseList);
   }
 
   public  List<StudentCourse> searchStudentCourseList() {
@@ -96,15 +93,15 @@ public class StudentService {
       repository.registerStudentCourse(studentCourse);
 
       // 申込状況の初期値「仮申込」を登録する
-      CourseApplicationStatus applicationStatus = new CourseApplicationStatus();
-      applicationStatus.setStudentCourseId(studentCourse.getId());
-      applicationStatus.setApplicationStatus("仮申込"); // 初期ステータス
-      LocalDateTime now = LocalDateTime.now();
-      applicationStatus.setCreatedAt(now);
-      applicationStatus.setLastUpdatedAt(now);
-      applicationStatus.setLastUpdatedBy("system"); // systemは更新者による自動処理
-      applicationStatus.setNotes("初回説明会に参加予定");
-      applicationStatus.setIsDeleted(false);
+      CourseApplicationStatus applicationStatus = new CourseApplicationStatus(
+      studentCourse.getId(),
+      "仮申込",
+      LocalDateTime.now(),
+      LocalDateTime.now(),
+      "system",
+      "初回説明会に参加予定",
+      false
+      );
       // DBのcourse_application_statusテーブルにデータを登録（INSERT）する
       repository.registerCourseApplicationStatus(applicationStatus);
       // Javaオブジェクトに反映

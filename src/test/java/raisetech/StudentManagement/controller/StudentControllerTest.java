@@ -72,30 +72,37 @@ class StudentControllerTest {
   // Validationテスト
   @Test
   void 受講生詳細の受講生で適切な値を入力した時に入力チェックに異常が発生しないこと() {
-    Student student = new Student();
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "test@example.com",
+    "愛知",
+    25,
+    "男性",
+    "",
+    false
+    );
     student.setId(1L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setSex("男性");
 
     Set<ConstraintViolation<Student>> violations = validator.validate(student);
-    //assertEquals(0, violations.size()); テスト的に弱い
     assertThat(violations.size()).isEqualTo(0);
   }
 
   // Eメールが空文字の場合のチェック
   @Test
   void 受講生詳細のEメールが空文字の時入力チェックに掛かること() {
-    Student student = new Student();
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("");
-    student.setArea("愛知");
-    student.setSex("男性");
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "",
+    "愛知",
+    25,
+    "男性",
+    "",
+    false
+    );
 
     Set<ConstraintViolation<Student>> violations = validator.validate(student);
     assertThat(violations).isNotEmpty();
@@ -105,13 +112,17 @@ class StudentControllerTest {
   // 受講生IDが0の場合のチェック
   @Test
   void 受講生詳細のEメールが不正な形式の時入力チェックに掛かること() {
-    Student student = new Student();
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("abc");
-    student.setArea("愛知");
-    student.setSex("男性");
+    Student student = new Student(
+        "テスト太郎",
+        "テストタロウ",
+        "テスト",
+        "abc",
+        "愛知",
+        25,
+        "男性",
+        "",
+        false
+    );
 
     Set<ConstraintViolation<Student>> violations = validator.validate(student);
     assertThat(violations.size()).isEqualTo(1);
@@ -121,14 +132,18 @@ class StudentControllerTest {
   // Studentクラスの@Emailチェック
   @Test
   void 受講生詳細のメールが不適当な型の時に入力チェックに掛かること() {
-    Student student = new Student();
+    Student student = new Student(
+        "テスト太郎",
+        "テストタロウ",
+        "テスト",
+        "invalid-test",
+        "愛知",
+        25,
+        "男性",
+        "",
+        false
+    );
     student.setId(12L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("invalid-test");
-    student.setArea("愛知");
-    student.setSex("男性");
 
     Set<ConstraintViolation<Student>> violations = validator.validate(student);
     assertThat(violations).extracting("message").containsOnly("正しいメールアドレスを入力してください。");
@@ -137,15 +152,18 @@ class StudentControllerTest {
   // GetMappingのREST APIのテスト Validationテストを含む
   @Test
   void IDに紐づく任意の受講生詳細の一覧検索が実行と取得ができること() throws Exception {
-    Student student = new Student();
+    Student student = new Student(
+        "テスト太郎",
+        "テストタロウ",
+        "テスト",
+        "test@example.com",
+        "愛知",
+        25,
+        "男性",
+        "",
+        false
+    );
     student.setId(12L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setSex("男性");
-    // REST API用テストデータ　例：Long id = 999L;
 
     StudentDetail studentDetail = new StudentDetail();
     studentDetail.setStudent(student);
@@ -176,35 +194,38 @@ class StudentControllerTest {
   @Test
   void 受講生詳細の登録が実行できて空で返ってくること() throws Exception {
     // 受講生オブジェクトを作成
-    Student student = new Student();
+    Student student = new Student(
+        "テスト太郎",
+        "テストタロウ",
+        "テスト",
+        "test@example.com",
+        "愛知",
+        25,
+        "男性",
+        "備考欄",
+        false
+    );
     student.setId(12L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setAge(25);
-    student.setSex("男性");
-    student.setRemark("備考欄");
-    student.setIsDeleted(false);
 
     // 受講生コースオブジェクトを作成
-    StudentCourse studentCourse = new StudentCourse();
+    StudentCourse studentCourse = new StudentCourse(
+    12L,
+    "データベース設計コース",
+    LocalDateTime.of(2025, 7, 1, 10, 0),
+    LocalDateTime.of(2025, 12, 31, 18, 0)
+    );
     studentCourse.setId(111);
-    studentCourse.setStudentId(12L);
-    studentCourse.setCourseName("データベース設計コース");
-    studentCourse.setCourseStartAt(LocalDateTime.of(2025, 7, 1, 10, 0));
-    studentCourse.setCourseEndAt(LocalDateTime.of(2025, 12, 31, 18, 0));
 
     // 申込状況オブジェクトを作成
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
-    courseApplicationStatus.setStudentCourseId(111);
-    courseApplicationStatus.setApplicationStatus("本申込");
-    courseApplicationStatus.setCreatedAt(LocalDateTime.of(2025, 8, 1, 13, 0));
-    courseApplicationStatus.setLastUpdatedAt(LocalDateTime.of(2025, 8, 10, 18, 0));
-    courseApplicationStatus.setLastUpdatedBy("admin");
-    courseApplicationStatus.setNotes("本人確認済み");
-    courseApplicationStatus.setIsDeleted(false);
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    111,
+    "本申込",
+    LocalDateTime.of(2025, 8, 1, 13, 0),
+    LocalDateTime.of(2025, 8, 10, 18, 0),
+    "admin",
+    "本人確認済み",
+    false
+    );
 
     // 受講生コース詳細(申込状況付き)に受講生コースオブジェクトと申込状況オブジェクトを設定
     StudentCourseDetail studentCourseDetail = new StudentCourseDetail();
@@ -267,35 +288,38 @@ class StudentControllerTest {
   @Test
   void 受講生情報の更新が実行できて空で返ってくること() throws Exception {
     // 受講生オブジェクトを作成
-    Student student = new Student();
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "test@example.com",
+    "愛知",
+    25,
+    "男性",
+    "備考欄",
+    false
+    );
     student.setId(12L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setAge(25);
-    student.setSex("男性");
-    student.setRemark("備考欄");
-    student.setIsDeleted(false);
 
     // 受講生コースオブジェクトを作成
-    StudentCourse studentCourse = new StudentCourse();
+    StudentCourse studentCourse = new StudentCourse(
+    12L,
+    "データベース設計コース",
+    LocalDateTime.of(2025, 7, 1, 10, 0),
+    LocalDateTime.of(2025, 12, 31, 18, 0)
+    );
     studentCourse.setId(111);
-    studentCourse.setStudentId(12L);
-    studentCourse.setCourseName("データベース設計コース");
-    studentCourse.setCourseStartAt(LocalDateTime.of(2025, 7, 1, 10, 0));
-    studentCourse.setCourseEndAt(LocalDateTime.of(2025, 12, 31, 18, 0));
 
     // 申込状況オブジェクトを作成
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
-    courseApplicationStatus.setStudentCourseId(111);
-    courseApplicationStatus.setApplicationStatus("受講中");
-    courseApplicationStatus.setCreatedAt(LocalDateTime.of(2025, 8, 18, 9, 0));
-    courseApplicationStatus.setLastUpdatedAt(LocalDateTime.of(2025, 8, 20, 13, 0));
-    courseApplicationStatus.setLastUpdatedBy("system");
-    courseApplicationStatus.setNotes("出席率90%・課題提出率95%");
-    courseApplicationStatus.setIsDeleted(false);
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    111,
+    "受講中",
+    LocalDateTime.of(2025, 8, 18, 9, 0),
+    LocalDateTime.of(2025, 8, 20, 13, 0),
+    "system",
+    "出席率90%・課題提出率95%",
+    false
+    );
 
     // 受講生コース詳細(申込状況付き)に受講生コースオブジェクトと申込状況オブジェクトを設定
     StudentCourseDetail studentCourseDetail = new StudentCourseDetail();
@@ -439,10 +463,15 @@ class StudentControllerTest {
   // PostMappingのREST APIのテスト
   @Test
   void 申込状況が適切に登録できること() throws Exception {
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
-    courseApplicationStatus.setStudentCourseId(103);
-    courseApplicationStatus.setApplicationStatus("受講中");
-    courseApplicationStatus.setIsDeleted(false);
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    103,
+    "受講中",
+    LocalDateTime.now(),
+    LocalDateTime.now(),
+    "tester",
+    "登録テスト",
+    false
+    );
 
     mockMvc.perform(MockMvcRequestBuilders.post("/registerCourseApplicationStatus")
           .contentType(MediaType.APPLICATION_JSON) //JSON形式
@@ -475,11 +504,16 @@ class StudentControllerTest {
   // PutMappingのREST APIのテスト
   @Test
   void 任意の申込状況が適切に更新できること() throws Exception {
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    104,
+    "キャンセル",
+    LocalDateTime.now(),
+    LocalDateTime.now(),
+    "tester",
+    "更新テスト",
+    false
+  );
     courseApplicationStatus.setId(4);
-    courseApplicationStatus.setStudentCourseId(104);
-    courseApplicationStatus.setApplicationStatus("キャンセル");
-    courseApplicationStatus.setIsDeleted(false);
 
     mockMvc.perform(MockMvcRequestBuilders.put("/updateCourseApplicationStatus/{studentCourseId}", 104)
           .contentType(MediaType.APPLICATION_JSON)

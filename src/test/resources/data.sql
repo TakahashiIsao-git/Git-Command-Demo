@@ -1,14 +1,17 @@
-INSERT INTO students (name, kana_name, nick_name, email, area, age, sex)
-VALUES ('山田太郎', 'ヤマダタロウ', 'タロ', 'taro@example.com', '東京', 25, '男性'),
-       ('鈴木一郎', 'スズキイチロウ', 'イチ', 'ichiro@example.com', '大阪', 30, '男性'),
-       ('田中花子', 'タナカハナコ', 'ハナ', 'hana@example.com', '北海道', 22, '女性'),
-       ('佐藤良子', 'サトウリョウコ', 'リョウ', 'ryoko@example.com', '福岡', 28, '女性'),
-       ('伊藤遥', 'イトウハルカ', 'ハル', 'haruka@example.com', '愛知', 35, 'その他'),
-       ('加藤弥生', 'ヤヨイカトウ', 'ヤヨイ', 'yayoi@example.com', '埼玉', 39, '女性'),
-       ('和田真也', 'ワダシンヤ', 'シンヤ', 'shinya@example.com', '鹿児島', 53, '男性'),
-       ('江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性'),
-       ('江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性'),
-       ('高橋健太', 'タカハシケンタ', 'ケンタ', 'kenta@example.com', '神奈川', 35, '男性');
+INSERT INTO students (id, name, kana_name, nick_name, email, area, age, sex, remark, isDeleted)
+VALUES (1, '山田太郎', 'ヤマダタロウ', 'タロ', 'taro@example.com', '東京', 25, '男性', NULL, false),
+       (2, '鈴木一郎', 'スズキイチロウ', 'イチ', 'ichiro@example.com', '大阪', 30, '男性', NULL, false),
+       (3, '田中花子', 'タナカハナコ', 'ハナ', 'hana@example.com', '北海道', 22, '女性', NULL, false),
+       (4, '佐藤良子', 'サトウリョウコ', 'リョウ', 'ryoko@example.com', '福岡', 28, '女性', NULL, false),
+       (5, '伊藤遥', 'イトウハルカ', 'ハル', 'haruka@example.com', '愛知', 35, 'その他', NULL, false),
+       (8, '加藤弥生', 'ヤヨイカトウ', 'ヤヨイ', 'yayoi@example.com', '埼玉', 39, '女性', '', true),
+       (9, '和田真也', 'ワダシンヤ', 'シンヤ', 'shinya@example.com', '鹿児島', 53, '男性', '', false),
+       (10, '江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性', '', false),
+       (11, '江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性', '', false),
+       (15, '高橋健太', 'タカハシケンタ', 'ケンタ', 'kenta@example.com', '神奈川', 35, '男性', '', false);
+
+-- オートインクリメントを次のIDから始める
+ALTER TABLE students ALTER COLUMN id RESTART WITH 16;
 
 INSERT INTO students_courses (id, student_id, course_name, course_start_at, course_end_at)
 VALUES (101, 1, 'Web開発コース', '2025-02-01 09:00:00', '2025-04-30 15:00:00'),

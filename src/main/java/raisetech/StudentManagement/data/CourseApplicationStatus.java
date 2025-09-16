@@ -12,7 +12,6 @@ import lombok.Setter;
 @Schema(description = "申込状況")
 @Getter
 @Setter
-// @ToString
 public class CourseApplicationStatus {
   /** 主キー */
   private Integer id;
@@ -38,4 +37,36 @@ public class CourseApplicationStatus {
 
   /** 論理削除フラグ */
   private Boolean isDeleted;
+
+  /** 引数付きコンストラクタ 本番用(idなし) */
+  public CourseApplicationStatus(
+      Integer studentCourseId,
+      String applicationStatus,
+      LocalDateTime createdAt,
+      LocalDateTime lastUpdatedAt,
+      String lastUpdatedBy,
+      String notes,
+      Boolean isDeleted
+  ) {
+    this.studentCourseId = studentCourseId;
+    this.applicationStatus = applicationStatus;
+    this.createdAt = createdAt;
+    this.lastUpdatedAt = lastUpdatedAt;
+    this.lastUpdatedBy = lastUpdatedBy;
+    this.notes = notes;
+    this.isDeleted = isDeleted;
+  }
+
+  /** 引数付きコンストラクタ テスト専用(idあり) */
+  public CourseApplicationStatus(Integer id, Integer studentCourseId,
+      String applicationStatus, LocalDateTime createdAt, LocalDateTime lastUpdatedAt,
+      String lastUpdatedBy, String notes, Boolean isDeleted) {
+    this(studentCourseId, applicationStatus, createdAt, lastUpdatedAt,
+       lastUpdatedBy, notes, isDeleted);
+    this.id = id;
+  }
+
+  /** JPA用にデフォルトコンストラクタ */
+  public CourseApplicationStatus() {}
+
 }

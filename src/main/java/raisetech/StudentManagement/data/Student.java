@@ -1,12 +1,8 @@
 package raisetech.StudentManagement.data;
 
-// import lombok.ToString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +12,6 @@ import lombok.Setter;
 @Schema(description = "受講生")
 @Getter
 @Setter
-// @ToString
 public class Student {
 
   private Long id;
@@ -44,4 +39,38 @@ public class Student {
 
   private String remark;
   private Boolean isDeleted;
+
+  /** 引数付きコンストラクタ 本番用(idなし) */
+  public Student(
+      String name,
+      String kanaName,
+      String nickName,
+      String email,
+      String area,
+      int age,
+      String sex,
+      String remark,
+      Boolean isDeleted
+  ) {
+    this.name = name;
+    this.kanaName = kanaName;
+    this.nickName = nickName;
+    this.email = email;
+    this.area = area;
+    this.age = age;
+    this.sex = sex;
+    this.remark = remark;
+    this.isDeleted = isDeleted;
+  }
+
+  /** 引数付きコンストラクタ テスト専用(idあり) */
+  public Student(Long id, String name, String kanaName, String nickName, String email,
+      String area, int age, String sex, String remark, Boolean isDeleted) {
+    this(name, kanaName, nickName, email, area, age, sex, remark, isDeleted);
+    this.id = id;
+  }
+
+  /** JPA用にデフォルトコンストラクタ */
+  public Student() {}
+
 }

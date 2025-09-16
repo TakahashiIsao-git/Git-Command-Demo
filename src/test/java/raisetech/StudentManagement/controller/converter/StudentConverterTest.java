@@ -28,22 +28,25 @@ class StudentConverterTest {
     Student student = createStudent(); // リファクタリングのメソッド抽出
 
     // 受講生コースのテストデータの用意
-    StudentCourse studentCourse = new StudentCourse();
+    StudentCourse studentCourse = new StudentCourse(
+    1L,
+    "Javaコース",
+    LocalDateTime.now(),
+    LocalDateTime.now().plusYears(1)
+    );
     studentCourse.setId(101);
-    studentCourse.setStudentId(1L);
-    studentCourse.setCourseName("Javaコース");
-    studentCourse.setCourseStartAt(LocalDateTime.now());
-    studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
 
     // 申込状況のテストデータの用意
-    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus();
+    CourseApplicationStatus courseApplicationStatus = new CourseApplicationStatus(
+    101,
+    "仮申込",
+    LocalDateTime.now(),
+    LocalDateTime.now(),
+    "admin",
+    "初回問い合わせあり",
+    false
+    );
     courseApplicationStatus.setId(1);
-    courseApplicationStatus.setStudentCourseId(101);
-    courseApplicationStatus.setApplicationStatus("仮申込");
-    courseApplicationStatus.setCreatedAt(LocalDateTime.now());
-    courseApplicationStatus.setLastUpdatedAt(LocalDateTime.now());
-    courseApplicationStatus.setLastUpdatedBy("admin");
-    courseApplicationStatus.setNotes("初回問い合わせあり");
 
     // 実行
     List<StudentDetail> actual = sut.convertStudentDetails(
@@ -63,12 +66,13 @@ class StudentConverterTest {
     // 事前準備
     Student student = createStudent();
 
-    StudentCourse studentCourse = new StudentCourse();
+    StudentCourse studentCourse = new StudentCourse(
+    1L,
+    "Javaコース",
+    LocalDateTime.now(),
+    LocalDateTime.now().plusYears(1)
+    );
     studentCourse.setId(101);
-    studentCourse.setStudentId(1L);
-    studentCourse.setCourseName("Javaコース");
-    studentCourse.setCourseStartAt(LocalDateTime.now());
-    studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
 
     // 申込状況が空のテストデータを設定する
     List<CourseApplicationStatus> courseApplicationStatusList = List.of();
@@ -83,17 +87,18 @@ class StudentConverterTest {
   }
 
   private Student createStudent() {
-    Student student = new Student();
+    Student student = new Student(
+    "テスト太郎",
+    "テストタロウ",
+    "テスト",
+    "test@example.com",
+    "愛知",
+    25,
+    "男性",
+    "",
+    false
+    );
     student.setId(1L);
-    student.setName("テスト太郎");
-    student.setKanaName("テストタロウ");
-    student.setNickName("テスト");
-    student.setEmail("test@example.com");
-    student.setArea("愛知");
-    student.setAge(25);
-    student.setSex("男性");
-    student.setRemark("");
-    student.setIsDeleted(false);
     return student;
   }
 }

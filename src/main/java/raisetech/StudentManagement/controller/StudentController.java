@@ -2,9 +2,8 @@ package raisetech.StudentManagement.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -155,8 +154,8 @@ public class StudentController {
   @GetMapping("/courseApplicationStatus/{studentCourseId}")
   public ResponseEntity<CourseApplicationStatus> getCourseApplicationStatus(@PathVariable Integer studentCourseId) {
     CourseApplicationStatus courseApplicationStatus = service.searchCourseApplicationStatus(studentCourseId);
-    //
-    if (courseApplicationStatus == null) {
+    // 可読性とコードレビューのスムーズを考慮して==nullからObject.isNull()に修正
+    if (Objects.isNull(courseApplicationStatus)) {
       return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(courseApplicationStatus);
