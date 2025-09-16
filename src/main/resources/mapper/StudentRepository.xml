@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="raisetech.StudentManagement.repository.StudentRepository">
 
-  <!-- 受講生の全件検索-->
+  <!-- 受講生情報の全件検索-->
   <select id="search" resultType="raisetech.StudentManagement.data.Student">
     SELECT *
     FROM students
   </select>
 
-  <!-- 受講生の検索-->
+  <!-- 受講生情報の検索-->
   <select id="searchStudent" resultType="raisetech.StudentManagement.data.Student">
     SELECT *
     FROM students
@@ -26,11 +26,27 @@
     SELECT *
     FROM students_courses
     WHERE student_id = #{studentId}
+    ORDER BY id
   </select>
   
-  <!-- 受講生の新規登録-->
+  <!-- 申込状況情報の全件検索-->
+  <select id="searchCourseApplicationStatusList" resultType="raisetech.StudentManagement.data.CourseApplicationStatus">
+    SELECT *
+    FROM course_application_status
+  </select>
+
+  <!-- 受講生コースIDに紐づく申込状況情報の検索：単一件返却に限定する -->
+  <select id="searchCourseApplicationStatus" resultType="raisetech.StudentManagement.data.CourseApplicationStatus">
+    SELECT *
+    FROM course_application_status
+    WHERE student_course_id = #{studentCourseId}
+    ORDER BY id ASC
+    LIMIT 1
+  </select>
+  
+  <!-- 受講生情報の新規登録-->
   <insert id="registerStudent" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO students (name, kana_name, nickName, email, area, age, sex, remark, isDeleted)
+    INSERT INTO students (name, kana_name, nick_name, email, area, age, sex, remark, isDeleted)
     VALUES (#{name}, #{kanaName}, #{nickName}, #{email}, #{area}, #{age}, #{sex}, #{remark}, false)
   </insert>
 
@@ -40,18 +56,28 @@
     VALUES (#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt})
   </insert>
 
-  <!-- 受講生の更新 -->
+  <!-- 申込状況情報の新規登録-->
+  <insert id="registerCourseApplicationStatus" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO course_application_status (
+    student_course_id, application_status, created_at, last_updated_at, last_updated_by, notes, isDeleted)
+    VALUES (#{studentCourseId}, #{applicationStatus}, #{createdAt}, #{lastUpdatedAt}, #{lastUpdatedBy}, #{notes}, #{isDeleted})
+  </insert>
+
+  <!-- 受講生情報の更新 -->
   <update id="updateStudent">
-    UPDATE students SET
-     name = #{name},
-     kana_name = #{kanaName},
-     nickName = #{nickName},
-     email = #{email},
-     area = #{area},
-     age = #{age},
-     sex = #{sex},
-     remark = #{remark},
-     isDeleted = #{isDeleted}
+    UPDATE students
+    SET
+      name = #{name},
+      kana_name = #{kanaName},
+      nick_name = #{nickName},
+      email = #{email},
+      area = #{area},
+      age = #{age},
+      sex = #{sex},
+      remark = #{remark}
+      <if test="isDeleted != null">
+        , isDeleted = #{isDeleted}
+      </if>
     WHERE id = #{id}
   </update>
 
@@ -60,9 +86,36 @@
     UPDATE students_courses SET course_name = #{courseName} WHERE id = #{id}
   </update>
 
+  <!-- 申込状況情報の申込状況、更新者、メモの更新-->
+  <update id="updateCourseApplicationStatus">
+    UPDATE course_application_status SET
+      application_status = #{courseApplicationStatus.applicationStatus},
+      last_updated_at = CURRENT_TIMESTAMP,
+      last_updated_by = #{courseApplicationStatus.lastUpdatedBy},
+      notes = #{courseApplicationStatus.notes}
+    WHERE student_course_id = #{studentCourseId}
+      AND isDeleted = false
+  </update>
+
+  <!-- 受講生情報の論理削除 -->
+  <update id="deleteStudent">
+    UPDATE students
+    SET isDeleted = true
+    WHERE id = #{id}
+  </update>
+
   <!-- 論理削除でキャンセルした受講生情報の復元 -->
   <update id="restoreStudent">
-    UPDATE students SET isDeleted = false WHERE id = #{id}
+    UPDATE students
+    SET isDeleted = false
+    WHERE id = #{id}
+  </update>
+
+  <!-- 申込状況情報の論理削除-->
+  <update id="deleteCourseApplicationStatus">
+    UPDATE course_application_status
+    SET isDeleted = true
+    WHERE id = #{id}
   </update>
 
 </mapper>
