@@ -12,6 +12,16 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+	withJavadocJar()
+	withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ["--enable-preview"]
+}
+
+tasks.withType(Test).configureEach {
+	jvmArgs += ["--enable-preview"]
 }
 
 repositories {
