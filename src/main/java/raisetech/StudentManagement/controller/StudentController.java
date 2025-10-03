@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.CourseApplicationStatus;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -48,6 +49,73 @@ public class StudentController {
   public List<StudentDetail> getStudentList() throws TestException{
     return service.searchStudentList();
     // throw new TestException("現在このAPIは利用できません。URLは「studentList」ではなく「students」を利用してください。");
+  }
+
+  /**
+   * 名前による受講生の完全一致検索です。
+   *
+   * @param name 受講生の名前
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  @Operation(summary = "名前で完全一致検索", description = "名前に完全一致する受講生を検索します。")
+  @GetMapping("/studentByName/{name}")
+  // あとで拡張して404 Not Foundを返す場合にも対応しやすいようにResponseEntityを用いる
+  public ResponseEntity<List<Student>> getStudentByName(@PathVariable String name) {
+    // 完全一致検索では複数件ヒットする可能性があるため、戻り型をListで設定する
+    List<Student> students = service.searchStudentByName(name);
+    return ResponseEntity.ok(students);
+  }
+
+  /**
+   * Eメールによる受講生の完全一致検索です。
+   *
+   * @param email 受講生のEメール
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  @Operation(summary = "Eメールで完全一致検索", description = "Eメールに完全一致する受講生を検索します。")
+  @GetMapping("/studentByEmail/{email}")
+  public ResponseEntity<List<Student>> getStudentByEmail(@PathVariable String email) {
+    List<Student> students = service.searchStudentByEmail(email);
+    return ResponseEntity.ok(students);
+  }
+
+  /**
+   * エリアによる受講生の完全一致検索です。
+   *
+   * @param area 受講生のエリア
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  @Operation(summary = "エリアで完全一致検索", description = "エリアに完全一致する受講生を検索します。")
+  @GetMapping("/studentByArea/{area}")
+  public ResponseEntity<List<Student>> getStudentByArea(@PathVariable String area) {
+    List<Student> students = service.searchStudentByArea(area);
+    return ResponseEntity.ok(students);
+  }
+
+  /**
+   * 年齢による受講生の完全一致検索です。
+   *
+   * @param age 受講生の年齢
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  @Operation(summary = "年齢で完全一致検索", description = "年齢に完全一致する受講生を検索します。")
+  @GetMapping("/studentByAge/{age}")
+  public ResponseEntity<List<Student>> getStudentByAge(@PathVariable int age) {
+    List<Student> students = service.searchStudentByAge(age);
+    return ResponseEntity.ok(students);
+  }
+
+  /**
+   * 性別による受講生の完全一致検索です。
+   *
+   * @param sex 受講生の性別
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  @Operation(summary = "性別で完全一致検索", description = "性別に完全一致する受講生を検索します。")
+  @GetMapping("/studentBySex/{sex}")
+  public ResponseEntity<List<Student>> getStudentBySex(@PathVariable String sex) {
+    List<Student> students = service.searchStudentBySex(sex);
+    return ResponseEntity.ok(students);
   }
 
   /**

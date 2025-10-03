@@ -25,7 +25,83 @@ class StudentRepositoryTest {
   void 受講生の全件検索が実行できること() {
     List<Student> actual = sut.search();
 
-    assertThat(actual.size()).isEqualTo(11);
+    assertThat(actual.size()).isEqualTo(16);
+  }
+
+  @Test
+  void 名前で受講生を完全一致検索できること() {
+    List<Student> actual = sut.searchStudentByName("山田太郎");
+
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0).getEmail()).isEqualTo("taro@example.com");
+  }
+
+  @Test
+  void 存在しない名前の検索で空のリストが返ってくること() {
+    List<Student> actual = sut.searchStudentByName("テスト名前");
+
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void Eメールで受講生を完全一致検索できること() {
+    List<Student> actual = sut.searchStudentByEmail("ichiro@example.com");
+
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0).getName()).isEqualTo("鈴木一郎");
+  }
+
+  @Test
+  void 存在しないEメールの検索で空のリストが返ってくること() {
+    List<Student> actual = sut.searchStudentByEmail("notfound@example.com");
+
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void エリアで受講生を完全一致検索できること() {
+    List<Student> actual = sut.searchStudentByArea("北海道");
+
+    assertThat(actual).isNotEmpty();
+    assertThat(actual).extracting(Student::getName).contains("田中花子");
+  }
+
+  @Test
+  void 存在しないエリアの検索で空のリストが返ってくること() {
+    List<Student> actual = sut.searchStudentByArea("南極");
+
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void 年齢で受講生を完全一致検索できること() {
+    List<Student> actual = sut.searchStudentByAge(35);
+
+    assertThat(actual).isNotEmpty();
+    assertThat(actual).extracting(Student::getName).contains("伊藤遥", "高橋健太");
+  }
+
+  @Test
+  void 存在しない年齢の検索で空のリストが返ってくること() {
+    List<Student> actual = sut.searchStudentByAge(999);
+
+    assertThat(actual).isEmpty();
+  }
+
+  @Test
+  void 性別で受講生を完全一致検索できること() {
+    List<Student> actual = sut.searchStudentBySex("男性");
+
+    assertThat(actual).isNotEmpty();
+    assertThat(actual).extracting(Student::getName).contains(
+      "山田太郎", "鈴木一郎", "和田真也", "高橋健太");
+  }
+
+  @Test
+  void 存在しない性別の検索で空のリストが返ってくること() {
+    List<Student> actual = sut.searchStudentBySex("不明");
+
+    assertThat(actual).isEmpty();
   }
 
   @Test
@@ -124,7 +200,7 @@ class StudentRepositoryTest {
 
     List<Student> actual = sut.search();
 
-    assertThat(actual.size()).isEqualTo(12);
+    assertThat(actual.size()).isEqualTo(17);
   }
 
   // NotNull制約があるカラムをnullにして登録しようとすると例外が発生すること

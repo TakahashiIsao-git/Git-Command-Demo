@@ -8,10 +8,15 @@ VALUES (1, '山田太郎', 'ヤマダタロウ', 'タロ', 'taro@example.com', '
        (9, '和田真也', 'ワダシンヤ', 'シンヤ', 'shinya@example.com', '鹿児島', 53, '男性', '', false),
        (10, '江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性', '', false),
        (11, '江藤由紀子', 'エトウユキコ', 'ユキコ', 'yukiko@example.com', '奈良', 46, '女性', '', false),
-       (15, '高橋健太', 'タカハシケンタ', 'ケンタ', 'kenta@example.com', '神奈川', 35, '男性', '', false);
+       (15, '高橋健太', 'タカハシケンタ', 'ケンタ', 'kenta@example.com', '神奈川', 35, '男性', '', false),
+       (16, 'テスト太郎', 'テストタロウ', 'テスト', 'test@example.com', '愛知', 25, '男性', '', false),
+       (17, 'テスト裕子', 'テストユウコ', 'ユウコ', 'yuko@example.com', '千葉', 23, '女性', '', false),
+       (18, 'テストひな', 'テストヒナ', 'ヒナ', 'hina@example.com', '広島', 40, '女性', '', false),
+       (19, 'テスト五郎', 'テストゴロウ', 'ゴロウ', 'gorou@example.com', '京都', 51, '男性', '', false),
+       (20, 'テストりん', 'テストリン', 'リン', 'rin@example.com', '三重', 45, '女性', '', false);
 
 -- オートインクリメントを次のIDから始める
-ALTER TABLE students ALTER COLUMN id RESTART WITH 16;
+ALTER TABLE students ALTER COLUMN id RESTART WITH 21;
 
 INSERT INTO students_courses (id, student_id, course_name, course_start_at, course_end_at)
 VALUES (101, 1, 'Web開発コース', '2025-02-01 09:00:00', '2025-04-30 15:00:00'),

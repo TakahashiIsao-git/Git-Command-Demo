@@ -43,6 +43,56 @@ public class StudentService {
   }
 
   /**
+   * 名前による受講生の完全一致検索です。
+   *
+   * @param name 受講生の名前
+   * @return 該当する受講生のリスト
+   */
+  public List<Student> searchStudentByName(String name) {
+    return repository.searchStudentByName(name);
+  }
+
+  /**
+   * Eメールによる受講生の完全一致検索です。
+   *
+   * @param email 受講生のEメール
+   * @return 該当する受講生のリスト
+   */
+  public List<Student> searchStudentByEmail(String email) {
+    return repository.searchStudentByEmail(email);
+  }
+
+  /**
+   * エリアによる受講生の完全一致検索です。
+   *
+   * @param area 受講生のエリア
+   * @return 該当する受講生のリスト
+   */
+  public List<Student> searchStudentByArea(String area) {
+    return repository.searchStudentByArea(area);
+  }
+
+  /**
+   * 年齢による受講生の完全一致検索です。
+   *
+   * @param age 受講生の年齢
+   * @return 該当する受講生のリスト
+   */
+  public List<Student> searchStudentByAge(int age) {
+    return repository.searchStudentByAge(age);
+  }
+
+  /**
+   * 性別による受講生の完全一致検索です。
+   *
+   * @param sex 受講生の性別
+   * @return 該当する受講生のリスト
+   */
+  public List<Student> searchStudentBySex(String sex) {
+    return repository.searchStudentBySex(sex);
+  }
+
+  /**
    * 受講生詳細の検索です。
    * IDに紐づく任意の受講生の情報を取得した後、
    * 関連するすべての受講生コース情報および各コースに対する申込状況（CourseApplicationStatus）も合わせて取得・設定します。

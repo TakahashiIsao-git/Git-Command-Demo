@@ -149,6 +149,126 @@ class StudentControllerTest {
     assertThat(violations).extracting("message").containsOnly("正しいメールアドレスを入力してください。");
   }
 
+  @Test
+  void 名前で完全一致検索が実行できて結果が返ってくること() throws  Exception {
+    Student student = new Student();
+    student.setName("テスト五郎");
+
+    Mockito.when(service.searchStudentByName("テスト五郎")).thenReturn(List.of(student));
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByName/{name}", "テスト五郎"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].name").value("テスト五郎"));
+
+    Mockito.verify(service, times(1)).searchStudentByName("テスト五郎");
+  }
+
+  @Test
+  void 名前で完全一致検索が実行できて空のリストが返ってくること() throws Exception {
+    Mockito.when(service.searchStudentByName("テスト名前")).thenReturn(List.of());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByName/{name}", "テスト名前"))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    Mockito.verify(service, times(1)).searchStudentByName("テスト名前");
+  }
+
+  @Test
+  void Eメールで完全一致検索が実行できて結果が返ってくること() throws  Exception {
+    Student student = new Student();
+    student.setEmail("yuko@example.com");
+
+    Mockito.when(service.searchStudentByEmail("yuko@example.com")).thenReturn(List.of(student));
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByEmail/{email}", "yuko@example.com"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].email").value("yuko@example.com"));
+
+    Mockito.verify(service, times(1)).searchStudentByEmail("yuko@example.com");
+  }
+
+  @Test
+  void Eメールで完全一致検索が実行できて空のリストが返ってくること() throws Exception {
+    Mockito.when(service.searchStudentByEmail("notfound@example.com")).thenReturn(List.of());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByEmail/{email}", "notfound@example.com"))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    Mockito.verify(service, times(1)).searchStudentByEmail("notfound@example.com");
+  }
+
+  @Test
+  void エリアで完全一致検索が実行できて結果が返ってくること() throws  Exception {
+    Student student = new Student();
+    student.setArea("広島");
+
+    Mockito.when(service.searchStudentByArea("広島")).thenReturn(List.of(student));
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByArea/{area}", "広島"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].area").value("広島"));
+
+    Mockito.verify(service, times(1)).searchStudentByArea("広島");
+  }
+
+  @Test
+  void エリアで完全一致検索が実行できて空のリストが返ってくること() throws Exception {
+    Mockito.when(service.searchStudentByArea("南極")).thenReturn(List.of());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByArea/{area}", "南極"))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    Mockito.verify(service, times(1)).searchStudentByArea("南極");
+  }
+
+  @Test
+  void 年齢で完全一致検索が実行できて結果が返ってくること() throws  Exception {
+    Student student = new Student();
+    student.setAge(25);
+
+    Mockito.when(service.searchStudentByAge(25)).thenReturn(List.of(student));
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByAge/{age}", 25))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].age").value(25));
+
+    Mockito.verify(service, times(1)).searchStudentByAge(25);
+  }
+
+  @Test
+  void 年齢で完全一致検索が実行できて空のリストが返ってくること() throws Exception {
+    Mockito.when(service.searchStudentByAge(999)).thenReturn(List.of());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentByAge/{age}", 999))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    Mockito.verify(service, times(1)).searchStudentByAge(999);
+  }
+
+  @Test
+  void 性別で完全一致検索が実行できて結果が返ってくること() throws  Exception {
+    Student student = new Student();
+    student.setSex("女性");
+
+    Mockito.when(service.searchStudentBySex("女性")).thenReturn(List.of(student));
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentBySex/{sex}", "女性"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].sex").value("女性"));
+
+    Mockito.verify(service, times(1)).searchStudentBySex("女性");
+  }
+
+  @Test
+  void 性別で完全一致検索が実行できて空のリストが返ってくること() throws Exception {
+    Mockito.when(service.searchStudentBySex("不明")).thenReturn(List.of());
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/studentBySex/{sex}", "不明"))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    Mockito.verify(service, times(1)).searchStudentBySex("不明");
+  }
+
   // GetMappingのREST APIのテスト Validationテストを含む
   @Test
   void IDに紐づく任意の受講生詳細の一覧検索が実行と取得ができること() throws Exception {

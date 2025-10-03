@@ -15,10 +15,10 @@ public interface StudentRepository {
 
   /**
    * 受講生の全件検索を行ないます。
+   * 論理削除されたレコードは対象外です。
    *
-   * @return 受講生の一覧情報(全件)
+   * @return 受講生の一覧情報(全件、論理削除済みは除外)
    */
-  /** 論理削除のレコードを一覧画面に表示させない */
   List<Student> search();
 
   /**
@@ -28,6 +28,46 @@ public interface StudentRepository {
    * @return 受講生情報
    */
   Student searchStudent(Long id);
+
+  /**
+   * 名前による完全一致検索を行ないます。
+   *
+   * @param name 検索対象の受講生の名前
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  List<Student> searchStudentByName(String name);
+
+  /**
+   * Ｅメールによる完全一致検索を行ないます。
+   *
+   * @param email 検索対象の受講生のEメール
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  List<Student> searchStudentByEmail(String email);
+
+  /**
+   * エリアによる完全一致検索を行ないます。
+   *
+   * @param area 検索対象の受講生のエリア
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  List<Student> searchStudentByArea(String area);
+
+  /**
+   * 年齢による完全一致検索を行ないます。
+   *
+   * @param age 検索対象の受講生の年齢
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  List<Student> searchStudentByAge(int age);
+
+  /**
+   * 性別による完全一致検索を行ないます。
+   *
+   * @param sex 検索対象の受講生の性別
+   * @return 該当する受講生のリスト（該当なしの場合は空リスト）
+   */
+  List<Student> searchStudentBySex(String sex);
 
   /**
    * 受講生のコース情報の全件検索を行ないます。
@@ -90,6 +130,7 @@ public interface StudentRepository {
   /**
    * 受講生コース情報のコース名を更新します。
    *
+   * ※テストでは更新後にsearchを使ってデータが変更されていることを確認してください。
    * @param studentCourse 受講生コース情報
    */
   // 受講生コース情報の更新処理 Testクラス作成の場合はデータの内容が更新されたことも確認する！searchを使用

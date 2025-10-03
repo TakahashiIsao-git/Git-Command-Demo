@@ -64,6 +64,38 @@ class StudentServiceTest {
   }
 
   @Test
+  void 受講生完全一致検索_名前に紐づきリポジトリの処理が適切に呼び出せていること() {
+    // 事前準備
+    Student student = new Student(
+        "山田太郎",
+        "タロウ",
+        "タロ",
+        "taro@example.com",
+        "東京",
+        25,
+        "男性",
+        "",
+        false
+    );
+    List<Student> expectedList = List.of(student);
+    Mockito.when(repository.searchStudentByName("山田太郎")).thenReturn(expectedList);
+
+    // 実行
+    List<Student> actual = sut.searchStudentByName("山田太郎");
+
+    // 検証
+    Mockito.verify(repository, times(1)).searchStudentByName("山田太郎");
+    Assertions.assertEquals(expectedList, actual);
+    // 個別フィールドの検証(戻ってきたStudentのデータ整合性も一緒に確認する)
+    Student actualList = actual.get(0);
+    Assertions.assertEquals("山田太郎", actualList.getName());
+    Assertions.assertEquals("taro@example.com", actualList.getEmail());
+    Assertions.assertEquals("東京", actualList.getArea());
+    Assertions.assertEquals(25, actualList.getAge());
+    Assertions.assertEquals("男性", actualList.getSex());
+  }
+
+  @Test
   void 受講生詳細検索_IDに紐づきリポジトリの処理が適切に呼び出せていること() {
     // 事前準備(before)
     Long id = 999L;
