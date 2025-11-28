@@ -46,40 +46,38 @@ jobs:
       - name: SSH Application Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ env.EC2_HOST }}
-          username: ${{ env.EC2_USER }}
-          key_path: private_key
-          script: |
-            sudo yum update -y
-
-            if [ -f /etc/systemd/system/StudentManagement.service ]; then
-              echo "Service file already exists"
-            else
-              sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<'EOL'
-           [Unit]
-           Description = StudentManagement App
+           host: ${{ env.EC2_HOST }}
+           username: ${{ env.EC2_USER }}
+           key_path: private_key
+           script: |
+             sudo yum update -y
+             if [ -f /etc/systemd/system/StudentManagement.service ]; then
+               echo "Service file already exists"
+             else
+               sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<'EOL'
+               [Unit]
+               Description = StudentManagement App
   
-           [Service]
-           ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
-           EnvironmentFile = /etc/sysconfig/StudentManagement
-           Restart = no
-           Type = simple
-           User = ec2-user
-           Group = ec2-user
-           SuccessExitStatus = 143
+               [Service]
+               ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
+               EnvironmentFile = /etc/sysconfig/StudentManagement
+               Restart = no
+               Type = simple
+               User = ec2-user
+               Group = ec2-user
+               SuccessExitStatus = 143
   
-           [Install]
-           WantedBy = multi-user.target
-           EOL
-           fi
+               [Install]
+               WantedBy = multi-user.target
+               EOL
+             fi
   
-           sudo systemctl daemon-reload
-  
-           if sudo systemctl is-active --quiet StudentManagement; then
-             sudo systemctl restart StudentManagement
-           else
-             sudo systemctl start StudentManagement
-           fi
+             sudo systemctl daemon-reload
+             if sudo systemctl is-active --quiet StudentManagement; then
+               sudo systemctl restart StudentManagement
+             else
+               sudo systemctl start StudentManagement
+             fi
 
       - name: Cleanup private key
         if: always()
