@@ -8,7 +8,7 @@ on:
 
 env:
   EC2_USER: ec2-user
-  EC2_HOST: 3.112.244.40
+  EC2_HOST: 52.194.213.238
   SRC_PATH: build/libs/*.jar
   DEST_PATH: /home/ec2-user/StudentManagement.jar
 
@@ -34,6 +34,9 @@ jobs:
       - name: Build application (bootJar)
         run: ./gradlew bootJar
 
+      - name: Check built jar
+        run: ls -al build/libs
+
       - name: Create private key file from secret
         run: |
           printf '%s\n' "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > private_key
@@ -41,43 +44,43 @@ jobs:
 
       - name: SCP copy application jar to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key "$SRC_PATH" "${{ env.EC2_USER }}"@"${{ env.EC2_HOST }}":"${{ env.DEST_PATH }}"
+          scp -o StrictHostKeyChecking=no -i private_key build/libs/*.jar ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.DEST_PATH }}
 
       - name: SSH Application Deploy
         uses: appleboy/ssh-action@master
         with:
-           host: ${{ env.EC2_HOST }}
-           username: ${{ env.EC2_USER }}
-           key_path: private_key
-           script: |
-             sudo yum update -y
-             if [ -f /etc/systemd/system/StudentManagement.service ]; then
-               echo "Service file already exists"
-             else
-               sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<'EOL'
-               [Unit]
-               Description = StudentManagement App
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USER }}
+          key_path: private_key
+          script: |
+            sudo yum update -y
+            if [ -f /etc/systemd/system/StudentManagement.service ]; then
+              echo "Service file already exists"
+            else
+              sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<'EOL'
+              [Unit]
+              Description = StudentManagement App
   
-               [Service]
-               ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
-               EnvironmentFile = /etc/sysconfig/StudentManagement
-               Restart = no
-               Type = simple
-               User = ec2-user
-               Group = ec2-user
-               SuccessExitStatus = 143
+              [Service]
+              ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
+              EnvironmentFile = /etc/sysconfig/StudentManagement
+              Restart = no
+              Type = simple
+              User = ec2-user
+              Group = ec2-user
+              SuccessExitStatus = 143
   
-               [Install]
-               WantedBy = multi-user.target
-               EOL
-             fi
+              [Install]
+              WantedBy = multi-user.target
+              EOL
+            fi
   
-             sudo systemctl daemon-reload
-             if sudo systemctl is-active --quiet StudentManagement; then
-               sudo systemctl restart StudentManagement
-             else
-               sudo systemctl start StudentManagement
-             fi
+            sudo systemctl daemon-reload
+            if sudo systemctl is-active --quiet StudentManagement; then
+              sudo systemctl restart StudentManagement
+            else
+              sudo systemctl start StudentManagement
+            fi
 
       - name: Cleanup private key
         if: always()
