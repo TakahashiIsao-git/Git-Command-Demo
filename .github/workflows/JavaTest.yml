@@ -8,7 +8,7 @@ on:
 
 env:
   EC2_USER: ec2-user
-  EC2_HOST: 52.194.213.238
+  EC2_HOST: 52.195.223.231
   SRC_PATH: build/libs/*.jar
   DEST_PATH: /home/ec2-user/StudentManagement.jar
 
@@ -57,21 +57,21 @@ jobs:
             if [ -f /etc/systemd/system/StudentManagement.service ]; then
               echo "Service file already exists"
             else
-              sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<'EOL'
+              sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<-'EOL'
               [Unit]
-              Description = StudentManagement App
-  
+              Description=StudentManagement App
+
               [Service]
               ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
-              EnvironmentFile = /etc/sysconfig/StudentManagement
-              Restart = no
-              Type = simple
-              User = ec2-user
-              Group = ec2-user
-              SuccessExitStatus = 143
-  
+              EnvironmentFile=/etc/sysconfig/StudentManagement
+              Restart=no
+              Type=simple
+              User=ec2-user
+              Group=ec2-user
+              SuccessExitStatus=143
+
               [Install]
-              WantedBy = multi-user.target
+              WantedBy=multi-user.target
               EOL
             fi
   
