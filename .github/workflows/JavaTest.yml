@@ -8,7 +8,7 @@ on:
 
 env:
   EC2_USER: ec2-user
-  EC2_HOST: 52.195.223.231
+  EC2_HOST: 46.51.235.100
   SRC_PATH: build/libs/*.jar
   DEST_PATH: /home/ec2-user/StudentManagement.jar
 
@@ -42,9 +42,28 @@ jobs:
           printf '%s\n' "${{ secrets.AWS_EC2_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
 
-      - name: SCP copy application jar to EC2
+      - name: Create service file locally
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key build/libs/*.jar ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.DEST_PATH }}
+          cat <<'EOL' > StudentManagement.service
+          [Unit]
+          Description=StudentManagement App
+
+          [Service]
+          ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
+          EnvironmentFile=/etc/sysconfig/StudentManagement
+          Restart=no
+          Type=simple
+          User=ec2-user
+          Group=ec2-user
+          SuccessExitStatus=143
+
+          [Install]
+          WantedBy=multi-user.target
+          EOL
+
+      - name: Copy service file to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key StudentManagement.service ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/tmp/
 
       - name: SSH Application Deploy
         uses: appleboy/ssh-action@master
@@ -56,25 +75,8 @@ jobs:
             sudo yum update -y
             if [ -f /etc/systemd/system/StudentManagement.service ]; then
               echo "Service file already exists"
-            else
-              sudo tee /etc/systemd/system/StudentManagement.service > /dev/null <<-'EOL'
-              [Unit]
-              Description=StudentManagement App
-
-              [Service]
-              ExecStart=/usr/bin/java -jar /home/ec2-user/StudentManagement.jar
-              EnvironmentFile=/etc/sysconfig/StudentManagement
-              Restart=no
-              Type=simple
-              User=ec2-user
-              Group=ec2-user
-              SuccessExitStatus=143
-
-              [Install]
-              WantedBy=multi-user.target
-              EOL
             fi
-  
+            sudo mv /tmp/StudentManagement.service /etc/systemd/system/StudentManagement.service
             sudo systemctl daemon-reload
             if sudo systemctl is-active --quiet StudentManagement; then
               sudo systemctl restart StudentManagement
