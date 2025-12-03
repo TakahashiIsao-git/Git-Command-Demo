@@ -61,6 +61,10 @@ jobs:
           WantedBy=multi-user.target
           EOL
 
+      - name: SCP copy application jar to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key build/libs/*.jar ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:${{ env.DEST_PATH }}
+
       - name: Copy service file to EC2
         run: |
           scp -o StrictHostKeyChecking=no -i private_key StudentManagement.service ${{ env.EC2_USER }}@${{ env.EC2_HOST }}:/tmp/
